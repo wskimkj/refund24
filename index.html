@@ -754,203 +754,167 @@ body {
       `;
     }
 
-    function calculateRefund() {
-      const points = parseInt(document.getElementById('points').value) || 0;
+  function calculateRefund() {
+  const points = parseInt(document.getElementById('points').value) || 0;
 
-      // 장바구니 일반쿠폰: 금액/퍼센트 처리
-      const extraCouponRaw = parseInt(document.getElementById('extraCoupon').value) || 0;
-      const extraCouponType = document.getElementById('extraCouponType').value;
+  // 장바구니 일반쿠폰: 금액/퍼센트 처리
+  const extraCouponRaw = parseInt(document.getElementById('extraCoupon').value) || 0;
+  const extraCouponType = document.getElementById('extraCouponType').value;
 
-      const reason = document.getElementById('reason').value;
-      const returnShippingPayment = document.getElementById('returnShippingPayment').value;
+  const reason = document.getElementById('reason').value;
+  const returnShippingPayment = document.getElementById('returnShippingPayment').value;
 
-      const rows = document.getElementById("productTable").getElementsByTagName("tbody")[0].rows;
+  const rows = document.getElementById("productTable").getElementsByTagName("tbody")[0].rows;
 
-      // 상품별 합계 (개별할인 반영 후)
-      let totalBeforeCoupon = 0;
-      for (let row of rows) {
-        const price = parseInt(row.cells[1].querySelector("input").value) || 0;
-        const discount = parseInt(row.cells[2].querySelector("input").value) || 0;
-        totalBeforeCoupon += Math.max(price - discount, 0);
-      }
+  // 1. 상품 전체 합계 (개별할인 반영 후)
+  let totalBeforeCoupon = 0;
+  for (let row of rows) {
+    const price = parseInt(row.cells[1].querySelector("input").value) || 0;
+    const discount = parseInt(row.cells[2].querySelector("input").value) || 0;
+    totalBeforeCoupon += Math.max(price - discount, 0);
+  }
 
-      // 장바구니 일반쿠폰 금액 계산
-      let extraCoupon = 0; // 실제 "금액" 단위로 변환된 값
-      if (extraCouponType === 'amount') {
-        extraCoupon = extraCouponRaw;
-      } else if (extraCouponType === 'percent') {
-        const percent = Math.max(0, Math.min(extraCouponRaw, 100));
-        extraCoupon = Math.floor(totalBeforeCoupon * (percent / 100));
-      }
-      extraCoupon = Math.min(extraCoupon, totalBeforeCoupon);
+  // 2. 장바구니 일반쿠폰 금액 계산 (원 / %)
+  let extraCoupon = 0;
+  if (extraCouponType === 'amount') {
+    extraCoupon = extraCouponRaw;
+  } else if (extraCouponType === 'percent') {
+    const percent = Math.max(0, Math.min(extraCouponRaw, 100));
+    extraCoupon = Math.floor(totalBeforeCoupon * (percent / 100));
+  }
+  extraCoupon = Math.min(extraCoupon, totalBeforeCoupon);
 
-      // 선택된 조건부 쿠폰
-      let selectedCoupons = Array.from(document.querySelectorAll('input[name="coupon"]:checked'))
-        .map(c => c.value.split("-").map(Number)); // [discount, condition]
+  // 3. 선택된 조건부 쿠폰
+  let selectedCoupons = Array.from(document.querySelectorAll('input[name="coupon"]:checked'))
+    .map(c => c.value.split("-").map(Number)); // [discount, condition]
 
-      // 조건부 쿠폰 총 적용 (최초 결제 기준)
-      let totalConditionalCoupon = 0;
-      selectedCoupons.forEach(([discount, condition]) => {
-        if (totalBeforeCoupon >= condition) totalConditionalCoupon += discount;
-      });
+  let totalConditionalCoupon = 0;
+  selectedCoupons.forEach(([discount, condition]) => {
+    if (totalBeforeCoupon >= condition) totalConditionalCoupon += discount;
+  });
 
-      const originalPaid = totalBeforeCoupon - totalConditionalCoupon - extraCoupon - points;
+  // 4. 상품별 환불 계산 (extra 쿠폰/적립금 비율 배분)
+  let refundTotal = 0;
+  let keptTotal = 0;
+  let refundDetails = "<strong>상품별 환불 내역:</strong><br>";
+  let hasRefund = false;
+  let allRefunded = true;
 
-      // 상품별 환불 계산
-      let refundTotal = 0;
-      let keptTotal = 0;
-      let refundDetails = "<strong>상품별 환불 내역:</strong><br>";
-      let hasRefund = false;
-      let allRefunded = true;
+  for (let row of rows) {
+    const name = row.cells[0].querySelector("input").value || "상품";
+    const price = parseInt(row.cells[1].querySelector("input").value) || 0;
+    const discount = parseInt(row.cells[2].querySelector("input").value) || 0;
+    const realPrice = Math.max(price - discount, 0);
+    const checked = row.cells[3].querySelector("input").checked;
 
-      for (let row of rows) {
-        const name = row.cells[0].querySelector("input").value || "상품";
-        const price = parseInt(row.cells[1].querySelector("input").value) || 0;
-        const discount = parseInt(row.cells[2].querySelector("input").value) || 0;
-        const realPrice = Math.max(price - discount, 0);
-        const checked = row.cells[3].querySelector("input").checked;
+    const ratio = totalBeforeCoupon > 0 ? realPrice / totalBeforeCoupon : 0;
+    const extraCouponAllocated = Math.floor(extraCoupon * ratio);
+    const pointsAllocated = Math.floor(points * ratio);
 
-        const ratio = totalBeforeCoupon > 0 ? realPrice / totalBeforeCoupon : 0;
-        const extraCouponAllocated = Math.floor(extraCoupon * ratio);
-        const pointsAllocated = Math.floor(points * ratio);
+    if (checked) {
+      const refundForItem = Math.max(realPrice - extraCouponAllocated - pointsAllocated, 0);
+      refundTotal += refundForItem;
+      refundDetails += `${name} (상품가 ${realPrice.toLocaleString()} - 일반쿠폰 ${extraCouponAllocated.toLocaleString()} - 적립금 ${pointsAllocated.toLocaleString()}) → 환불 ${refundForItem.toLocaleString()}원<br>`;
+      hasRefund = true;
+    } else {
+      keptTotal += realPrice;
+      allRefunded = false;
+    }
+  }
 
-        if (checked) {
-          const refundForItem = Math.max(realPrice - extraCouponAllocated - pointsAllocated, 0);
-          refundTotal += refundForItem;
-          refundDetails += `${name} (상품가 ${realPrice.toLocaleString()} - 일반쿠폰 ${extraCouponAllocated.toLocaleString()} - 적립금 ${pointsAllocated.toLocaleString()}) → 환불 ${refundForItem.toLocaleString()}원<br>`;
-          hasRefund = true;
-        } else {
-          keptTotal += realPrice;
-          allRefunded = false;
-        }
-      }
+  const resultContainer = document.getElementById('resultContainer');
+  const hiddenResultDiv = document.getElementById('result');
 
-      const resultContainer = document.getElementById('resultContainer');
-      const hiddenResultDiv = document.getElementById('result');
+  if (!hasRefund) {
+    resultContainer.classList.add('empty');
+    resultContainer.innerHTML = `
+      <div class="result-top">
+        <span class="result-label">Refund Breakdown</span>
+      </div>
+      <div class="result-text">
+        <p class="result-empty">환불 상품이 선택되지 않았습니다. 최소 1개 이상 체크해 주세요.</p>
+      </div>
+    `;
+    return;
+  }
 
-      if (!hasRefund) {
-        resultContainer.classList.add('empty');
-        resultContainer.innerHTML = `
-          <div class="result-top">
-            <span class="result-label">Refund Breakdown</span>
-          </div>
-          <div class="result-text">
-            <p class="result-empty">환불 상품이 선택되지 않았습니다. 최소 1개 이상 체크해 주세요.</p>
-          </div>
-        `;
-        return;
-      }
+  refundDetails += `<br>환불 요청 상품 합계: ${refundTotal.toLocaleString()}원<br>`;
 
-      refundDetails += `<br>환불 요청 상품 합계: ${refundTotal.toLocaleString()}원<br>`;
+  // 5. 조건부 쿠폰 유지/무효화 판정
+  let validConditionalCoupon = 0;
+  let couponMessages = "<br><strong>조건부 쿠폰 내역:</strong><br>";
+  selectedCoupons.forEach(([discount, condition]) => {
+    if (keptTotal >= condition) {
+      validConditionalCoupon += discount;
+      couponMessages += `쿠폰 ${discount.toLocaleString()}원 유지<br>`;
+    } else {
+      couponMessages += `<span style="color:#b91c1c">쿠폰 ${discount.toLocaleString()}원 무효화</span><br>`;
+    }
+  });
 
-      // 조건부 쿠폰 유지/무효화
-      let validConditionalCoupon = 0;
-      let couponMessages = "<br><strong>조건부 쿠폰 내역:</strong><br>";
-      selectedCoupons.forEach(([discount, condition]) => {
-        if (keptTotal >= condition) {
-          validConditionalCoupon += discount;
-          couponMessages += `쿠폰 ${discount.toLocaleString()}원 유지<br>`;
-        } else {
-          couponMessages += `<span style="color:#b91c1c">쿠폰 ${discount.toLocaleString()}원 무효화</span><br>`;
-        }
-      });
+  // 6. 최종 환불액 = 상품별 환불 합계 - (무효화된 조건부 쿠폰 금액)
+  let finalRefund = refundTotal;
+  const lostConditionalCoupon = totalConditionalCoupon - validConditionalCoupon;
+  if (lostConditionalCoupon > 0) {
+    couponMessages += `<span style="color:#b91c1c">총 ${lostConditionalCoupon.toLocaleString()}원 쿠폰 회수로 환불액에서 차감</span><br>`;
+    finalRefund -= lostConditionalCoupon;
+  }
 
-      // 최종 환불액 (쿠폰 재정산 반영)
-      let finalRefund;
-      if (validConditionalCoupon < totalConditionalCoupon) {
-        finalRefund = originalPaid - (keptTotal - validConditionalCoupon - extraCoupon - points);
-      } else {
-        finalRefund = refundTotal;
-      }
+  // 7. 배송비 로직
+  const FREE_LIMIT = 30000;
+  const SHIPPING = 3000;
+  let shippingDeduction = 0;
+  let shippingDetails = "<br><strong>배송비 내역:</strong><br>";
 
-      // 배송비 계산
-      const FREE_LIMIT = 30000;
-      const SHIPPING = 3000;
-      let shippingDeduction = 0;
-      let shippingDetails = "<br><strong>배송비 내역:</strong><br>";
-
-      if (reason === "buyer" && hasRefund) {
-        if (returnShippingPayment === "deduct") {
-          shippingDeduction += SHIPPING;
-          shippingDetails += `반품배송비 차감: -${SHIPPING.toLocaleString()}원<br>`;
-        } else {
-          shippingDetails += `반품배송비 선결제(직접 부담): 환불액에서 추가 차감 없음<br>`;
-        }
-
-        if (allRefunded && totalBeforeCoupon >= FREE_LIMIT) {
-          shippingDeduction += SHIPPING;
-          shippingDetails += `초도배송비 차감: -${SHIPPING.toLocaleString()}원<br>`;
-        } else if (keptTotal < FREE_LIMIT) {
-          shippingDeduction += SHIPPING;
-          shippingDetails += `남은 금액 ${keptTotal.toLocaleString()}원 < ${FREE_LIMIT.toLocaleString()}원 → 초도배송비 차감: -${SHIPPING.toLocaleString()}원<br>`;
-        }
-      } else {
-        shippingDetails += "판매자 사유: 배송비 차감 없음<br>";
-      }
-
-      finalRefund -= shippingDeduction;
-      const safeFinalRefund = Math.max(finalRefund, 0);
-
-      const combinedHtml = refundDetails + couponMessages + shippingDetails +
-        `<br><strong>최종 환불액: <span style="color:#166534">${safeFinalRefund.toLocaleString()}원</span></strong>`;
-
-      hiddenResultDiv.innerHTML = combinedHtml;
-
-      resultContainer.classList.remove('empty');
-      resultContainer.innerHTML = `
-        <div class="result-top">
-          <span class="result-label">Refund Breakdown</span>
-          <span class="badge-reason">${reason === "buyer" ? "구매자 사유" : "판매자 사유"}</span>
-        </div>
-        <div class="result-amount">
-          ${safeFinalRefund.toLocaleString()}<span class="currency">원 환불 예정</span>
-        </div>
-        <div class="result-text">
-          ${combinedHtml}
-        </div>
-      `;
+  if (reason === "buyer" && hasRefund) {
+    if (returnShippingPayment === "deduct") {
+      shippingDeduction += SHIPPING;
+      shippingDetails += `반품배송비 차감: -${SHIPPING.toLocaleString()}원<br>`;
+    } else {
+      shippingDetails += `반품배송비 선결제(직접 부담): 환불액에서 추가 차감 없음<br>`;
     }
 
-    function resetForm() {
-      document.getElementById('points').value = 0;
-      document.getElementById('extraCoupon').value = 0;
-      document.getElementById('extraCouponType').value = "amount";
-      document.getElementById('reason').value = "buyer";
-      document.getElementById('returnShippingPayment').value = "deduct";
-      document.querySelectorAll('input[name="coupon"]').forEach(c => c.checked = false);
-
-      const tbody = document.getElementById("productTable").getElementsByTagName("tbody")[0];
-      tbody.innerHTML = `
-        <tr>
-          <td><input type="text" value="" placeholder="예: 상의"></td>
-          <td><input type="number" value="" min="0" placeholder="0"></td>
-          <td><input type="number" value="" min="0" placeholder="0"></td>
-          <td><input type="checkbox"></td>
-        </tr>
-        <tr>
-          <td><input type="text" value="" placeholder="예: 하의"></td>
-          <td><input type="number" value="" min="0" placeholder="0"></td>
-          <td><input type="number" value="" min="0" placeholder="0"></td>
-          <td><input type="checkbox"></td>
-        </tr>
-      `;
-
-      const resultContainer = document.getElementById('resultContainer');
-      resultContainer.classList.add('empty');
-      resultContainer.innerHTML = `
-        <div class="result-top">
-          <span class="result-label">Refund</span>
-        </div>
-        <div class="result-text">
-          <p class="result-empty">
-            환불할 상품을 체크하고 금액을 입력한 뒤 <strong>“환불액 계산”</strong> 버튼을 눌러주세요.
-          </p>
-        </div>
-      `;
+    if (allRefunded && totalBeforeCoupon >= FREE_LIMIT) {
+      shippingDeduction += SHIPPING;
+      shippingDetails += `초도배송비 차감: -${SHIPPING.toLocaleString()}원<br>`;
+    } else if (keptTotal < FREE_LIMIT) {
+      shippingDeduction += SHIPPING;
+      shippingDetails += `남은 금액 ${keptTotal.toLocaleString()}원 < ${FREE_LIMIT.toLocaleString()}원 → 초도배송비 차감: -${SHIPPING.toLocaleString()}원<br>`;
     }
+  } else {
+    shippingDetails += "판매자 사유: 배송비 차감 없음<br>";
+  }
+
+  finalRefund -= shippingDeduction;
+  const safeFinalRefund = Math.max(finalRefund, 0);
+
+  const combinedHtml =
+    refundDetails +
+    couponMessages +
+    shippingDetails +
+    `<br><strong>최종 환불액: <span style="color:#166534">${safeFinalRefund.toLocaleString()}원</span></strong>`;
+
+  hiddenResultDiv.innerHTML = combinedHtml;
+
+  resultContainer.classList.remove('empty');
+  resultContainer.innerHTML = `
+    <div class="result-top">
+      <span class="result-label">Refund Breakdown</span>
+      <span class="badge-reason">${reason === "buyer" ? "구매자 사유" : "판매자 사유"}</span>
+    </div>
+    <div class="result-amount">
+      ${safeFinalRefund.toLocaleString()}<span class="currency">원 환불 예정</span>
+    </div>
+    <div class="result-text">
+      ${combinedHtml}
+    </div>
+  `;
+}
+
   </script>
 </body>
 </html>
+
 
 
 
