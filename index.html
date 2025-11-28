@@ -1,49 +1,713 @@
-<fieldset>
-  <legend>조건부 쿠폰 선택</legend>
-  <div class="coupon-list">
-    <!-- 기존 조건부 쿠폰 3종 -->
-    <label class="coupon-item">
-      <input type="checkbox" name="coupon" value="1000-10000">
-      <span class="coupon-label-main">10,000원 이상 결제 시 <strong>1,000원 할인</strong></span>
-      <span class="coupon-pill">10k / -1k</span>
-    </label>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <link rel="icon" type="image/x-icon" href="android-chrome-512x512 (1).ico">
+  <meta charset="UTF-8">
+  <title>계산기</title>
+  <style>
+    :root {
+      --bg: #fdf2f8;
+      --card: #ffffff;
+      --accent: #f472b6;
+      --accent-soft: #fb7185;
+      --accent-light: #fecdd3;
+      --danger: #ef4444;
+      --text-main: #3f2a33;
+      --text-muted: #9f8594;
+      --border-subtle: rgba(248, 187, 208, 0.7);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 20px 60px rgba(244, 114, 182, 0.25);
+      --transition-fast: 0.18s ease-out;
+    }
 
-    <label class="coupon-item">
-      <input type="checkbox" name="coupon" value="3000-30000">
-      <span class="coupon-label-main">30,000원 이상 결제 시 <strong>3,000원 할인</strong></span>
-      <span class="coupon-pill">30k / -3k</span>
-    </label>
+    * { box-sizing: border-box; }
 
-    <label class="coupon-item">
-      <input type="checkbox" name="coupon" value="5000-50000">
-      <span class="coupon-label-main">50,000원 이상 결제 시 <strong>5,000원 할인</strong></span>
-      <span class="coupon-pill">50k / -5k</span>
-    </label>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
+      background: #ffffff;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
 
-    <!-- 간격 띄우기 -->
-    <div style="height:6px;"></div>
+    .shell {
+      width: 100%;
+      max-width: 960px;
+      background:
+        radial-gradient(circle at 0 0, rgba(255, 228, 230, 0.9), transparent 55%),
+        linear-gradient(135deg, #ffffff, #fef9fb);
+      border-radius: 26px;
+      padding: 26px 24px 28px;
+      border: 1px solid rgba(248, 187, 208, 0.8);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(10px);
+    }
 
-    <!-- 사용자 입력 기타 조건부 쿠폰 -->
-    <div class="coupon-item">
-      <input type="checkbox" id="customCouponCheck">
-      <div class="coupon-label-main">
-        <div style="margin-bottom:4px;">기타 조건부 쿠폰</div>
-        <div class="field-inline">
-          <input
-            type="number"
-            id="customCondition"
-            min="0"
-            placeholder="예: 70000 (구매금액 이상)"
-          >
-          <input
-            type="number"
-            id="customDiscount"
-            min="0"
-            placeholder="예: 7000 (할인금액)"
-          >
+    @media (min-width: 880px) {
+      .shell { padding: 32px; }
+    }
+
+    header.app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .title-block {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .logo-pill {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: conic-gradient(from 180deg, #fb7185, #f97373, #f472b6, #fb7185);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 18px 35px rgba(244, 114, 182, 0.55);
+    }
+
+    .logo-pill-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #ffe4ef);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #9f1239;
+      font-size: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      color: #7f1d3a;
+    }
+
+    h1 span.sub {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent-soft);
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(254, 226, 226, 0.9);
+      border: 1px solid rgba(248, 113, 113, 0.55);
+    }
+
+    .header-desc {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .meta { font-size: 12px; color: var(--text-muted); text-align: right; }
+
+    .meta-pills {
+      display: flex; flex-wrap: wrap;
+      gap: 6px; justify-content: flex-end;
+    }
+
+    .meta-pill {
+      padding: 3px 8px; border-radius: 999px;
+      border: 1px solid rgba(248, 187, 208, 0.8);
+      background: rgba(255, 247, 250, 0.95);
+      color: #7f1d3a;
+    }
+
+    @media (max-width: 720px) {
+      header.app-header { flex-direction: column; align-items: flex-start; }
+      .meta { text-align: left; }
+      .meta-pills { justify-content: flex-start; }
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .card {
+      background:
+        radial-gradient(circle at 0 0, rgba(255, 241, 242, 0.9), transparent 60%),
+        linear-gradient(145deg, #ffffff, #fdf2f8);
+      border-radius: 18px; padding: 16px 16px 18px;
+      border: 1px solid var(--border-subtle);
+      position: relative; overflow: hidden;
+    }
+
+    .card-header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-muted); display: flex; gap: 6px;
+    }
+
+    .card-dot {
+      width: 7px; height: 7px; border-radius: 999px;
+      background: var(--accent); box-shadow: 0 0 15px rgba(244, 114, 182, 0.95);
+    }
+
+    .card-sub { font-size: 11px; color: var(--text-muted); }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px; margin-top: 4px;
+    }
+
+    @media (max-width: 720px) {
+      .field-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+
+    .field-label {
+      font-size: 12px; display: flex;
+      justify-content: space-between; gap: 6px; color: var(--text-muted);
+    }
+
+    .field-label span.main {
+      color: var(--text-main); font-weight: 500;
+    }
+
+    .field-inline { display: flex; gap: 6px; align-items: stretch; }
+
+    input[type="number"], input[type="text"], select {
+      border-radius: 10px;
+      border: 1px solid rgba(248, 187, 208, 0.9);
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--text-main);
+      padding: 8px 10px; font-size: 13px; outline: none;
+      width: 100%;
+      transition: 0.18s;
+    }
+
+    input[type="number"] { text-align: right; }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(244, 114, 182, 0.7);
+      transform: translateY(-1px);
+      background: #ffffff;
+    }
+
+    fieldset {
+      border-radius: 12px;
+      border: 1px dashed rgba(248, 187, 208, 0.9);
+      padding: 10px 12px 10px;
+      margin: 12px 0 0;
+      background: rgba(255, 247, 250, 0.95);
+    }
+
+    legend {
+      padding: 0 6px; font-size: 11px; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+
+    .coupon-list {
+      display: flex; flex-direction: column;
+      gap: 4px; margin-top: 4px;
+    }
+
+    .coupon-item {
+      font-size: 12px; color: var(--text-main);
+      display: flex; align-items: center; gap: 7px;
+    }
+
+    .coupon-pill {
+      font-size: 10px; padding: 2px 6px;
+      border-radius: 999px; border: 1px solid rgba(248,187,208,0.9);
+      background: rgba(255,241,242,0.95);
+      color: #9f1239; letter-spacing: 0.08em;
+    }
+
+    .table-wrapper {
+      margin-top: 4px; border-radius: 12px;
+      border: 1px solid rgba(248,187,208,0.9);
+      overflow: hidden; background: #fff7fb;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+
+    thead {
+      background: linear-gradient(135deg, #f9a8d4, #fb7185);
+      color: #fdf2f8;
+    }
+
+    th, td {
+      padding: 8px 10px; text-align: center;
+      border-bottom: 1px solid rgba(248,187,208,0.8);
+    }
+
+    tbody tr:nth-child(even) { background: #fff1f5; }
+    tbody tr:nth-child(odd) { background: #ffffff; }
+
+    tbody tr:hover {
+      background: rgba(251,207,232,0.6);
+    }
+
+    td input[type="text"],
+    td input[type="number"] {
+      width: 100%; padding: 6px 7px; font-size: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(248,187,208,0.9);
+    }
+
+    .actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+    button {
+      border-radius: 999px;
+      font-size: 13px; padding: 8px 18px;
+      display: inline-flex; align-items: center; gap: 7px;
+      font-weight: 500; cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+      color: #fff7fb; border: none;
+    }
+
+    .btn-ghost {
+      background: #fff7fb;
+      border: 1px solid rgba(248,187,208,0.9);
+      color: var(--text-muted);
+    }
+
+    .btn-danger {
+      background: #fee2e2; border: 1px solid #ef4444; color: #7f1d1d;
+    }
+
+    .result-container {
+      margin-top: 10px;
+      border-radius: 16px;
+      padding: 14px 14px 12px;
+      background: radial-gradient(circle at 0 0, rgba(187,247,208,0.8), #fff7fb);
+      border: 1px solid rgba(22,163,74,0.35);
+      box-shadow: 0 18px 45px rgba(34,197,94,0.35);
+      font-size: 12px;
+      max-height: 260px;
+      overflow: auto;
+    }
+
+    .result-container.empty {
+      background: rgba(255,247,250,0.95);
+      border-style: dashed;
+      border-color: rgba(248,187,208,0.9);
+      box-shadow: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="app-header">
+      <div class="title-block">
+        <div class="logo-pill"><div class="logo-pill-inner">₩</div></div>
+        <div>
+          <h1>환불 계산기 <span class="sub">환불 금액</span></h1>
+          <p class="header-desc">실제 환불될 금액을 확인하세요.</p>
         </div>
       </div>
-      <span class="coupon-pill">custom</span>
+
+      <div class="meta">
+        <div class="meta-pills">
+          <span class="meta-pill">쿠폰 유지 조건</span>
+          <span class="meta-pill">배송비 환불 로직 포함</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+
+      <!-- 왼쪽 카드 -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">Payment Summary <span class="card-dot"></span></div>
+          <div class="card-sub">결제 정보 · 환불 사유 입력</div>
+        </div>
+
+        <div class="field-grid">
+          
+          <div class="field">
+            <div class="field-label"><span class="main">① 사용 적립금</span><span>(원)</span></div>
+            <input type="number" id="points" value="0" min="0">
+          </div>
+
+          <div class="field">
+            <div class="field-label"><span class="main">② 추가 할인</span></div>
+            <div class="field-inline">
+              <input type="number" id="extraCoupon" value="0" min="0" placeholder="예: 3000 또는 30">
+              <select id="extraCouponType">
+                <option value="amount">원</option>
+                <option value="percent">%</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label"><span class="main">③ 환불 사유</span></div>
+            <select id="reason">
+              <option value="buyer">구매자 사유 (단순 변심 등)</option>
+              <option value="seller">판매자 사유 (불량, 오배송 등)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <div class="field-label"><span class="main">④ 반품비 결제 옵션</span></div>
+            <select id="returnShippingPayment">
+              <option value="deduct">환불금에서 차감</option>
+              <option value="prepaid">선결제(직접 부담)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 조건부 쿠폰 -->
+        <fieldset>
+          <legend>조건부 쿠폰 선택</legend>
+          <div class="coupon-list">
+
+            <!-- 10k -->
+            <label class="coupon-item">
+              <input type="checkbox" name="coupon" value="1000-10000">
+              <span class="coupon-label-main">10,000원 이상 결제 시 <strong>1,000원 할인</strong></span>
+              <span class="coupon-pill">10k / -1k</span>
+            </label>
+
+            <!-- 30k -->
+            <label class="coupon-item">
+              <input type="checkbox" name="coupon" value="3000-30000">
+              <span class="coupon-label-main">30,000원 이상 결제 시 <strong>3,000원 할인</strong></span>
+              <span class="coupon-pill">30k / -3k</span>
+            </label>
+
+            <!-- 50k -->
+            <label class="coupon-item">
+              <input type="checkbox" name="coupon" value="5000-50000">
+              <span class="coupon-label-main">50,000원 이상 결제 시 <strong>5,000원 할인</strong></span>
+              <span class="coupon-pill">50k / -5k</span>
+            </label>
+
+            <!-- 간격 -->
+            <div style="height:6px;"></div>
+
+            <!-- 사용자 입력 -->
+            <div class="coupon-item">
+              <input type="checkbox" id="customCouponCheck">
+              <div class="coupon-label-main">
+                <div style="margin-bottom:4px;">기타 조건부 쿠폰</div>
+                <div class="field-inline">
+                  <input type="number" id="customCondition" min="0" placeholder="예: 70000 (구매금액)">
+                  <input type="number" id="customDiscount" min="0" placeholder="예: 7000 (할인)">
+                </div>
+              </div>
+              <span class="coupon-pill">custom</span>
+            </div>
+
+          </div>
+        </fieldset>
+
+      </section>
+
+      <!-- 오른쪽 카드 -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">Item Lines <span class="card-dot"></span></div>
+          <div class="card-sub">환불 여부 선택</div>
+        </div>
+
+        <div class="table-wrapper">
+          <table id="productTable">
+            <thead>
+              <tr>
+                <th>상품명</th>
+                <th>상품가</th>
+                <th>개별할인</th>
+                <th>환불 여부</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" placeholder="예: 상의"></td>
+                <td><input type="number" min="0"></td>
+                <td><input type="number" min="0"></td>
+                <td><input type="checkbox"></td>
+              </tr>
+              <tr>
+                <td><input type="text" placeholder="예: 하의"></td>
+                <td><input type="number" min="0"></td>
+                <td><input type="number" min="0"></td>
+                <td><input type="checkbox"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-hint">· 상품가 = 정가 / 개별할인 = 즉시할인</div>
+
+        <div class="actions">
+          <button class="btn-ghost" onclick="addRow()">＋ 상품 추가</button>
+          <button class="btn-primary" onclick="calculateRefund()">⚡ 환불액 계산</button>
+          <button class="btn-danger" onclick="resetForm()">⟲ 초기화</button>
+        </div>
+
+        <div id="resultContainer" class="result-container empty">
+          <div class="result-top">
+            <span class="result-label">Refund Breakdown</span>
+          </div>
+          <div class="result-text">
+            <p class="result-empty">
+              환불할 상품을 체크하고 금액을 입력한 뒤 <strong>“환불액 계산”</strong> 버튼을 눌러주세요.
+            </p>
+          </div>
+        </div>
+
+        <div id="result" style="display:none;"></div>
+      </section>
+
     </div>
   </div>
-</fieldset>
+
+<script>
+
+/* ------------------------------
+  행 추가
+------------------------------ */
+function addRow() {
+  const table = document.querySelector("#productTable tbody");
+  const row = table.insertRow();
+  row.innerHTML = `
+    <td><input type="text" placeholder="상품명"></td>
+    <td><input type="number" min="0"></td>
+    <td><input type="number" min="0"></td>
+    <td><input type="checkbox"></td>
+  `;
+}
+
+/* ------------------------------
+  환불 계산
+------------------------------ */
+function calculateRefund() {
+
+  const points = parseInt(points.value) || 0;
+  const extraRaw = parseInt(extraCoupon.value) || 0;
+  const extraType = extraCouponType.value;
+
+  const reason = document.getElementById("reason").value;
+  const returnShippingPayment = document.getElementById("returnShippingPayment").value;
+
+  const rows = document.querySelectorAll("#productTable tbody tr");
+
+  /* 상품 전체 금액 */
+  let totalBeforeCoupon = 0;
+  rows.forEach(row => {
+    const price = parseInt(row.cells[1].querySelector("input").value) || 0;
+    const disc  = parseInt(row.cells[2].querySelector("input").value) || 0;
+    totalBeforeCoupon += Math.max(price - disc, 0);
+  });
+
+  /* 장바구니 일반 쿠폰 계산 */
+  let extraCouponValue = 0;
+  if (extraType === "amount") {
+    extraCouponValue = extraRaw;
+  } else {
+    const percent = Math.min(extraRaw, 100);
+    extraCouponValue = Math.floor(totalBeforeCoupon * (percent / 100));
+  }
+  extraCouponValue = Math.min(extraCouponValue, totalBeforeCoupon);
+
+  /* 조건부 쿠폰 모음 */
+  let selectedCoupons = [...document.querySelectorAll('input[name="coupon"]:checked')]
+    .map(c => c.value.split("-").map(Number)); // [할인금액, 조건]
+
+  /* 사용자 입력 쿠폰 */
+  const customChecked = customCouponCheck.checked;
+  const customCon = parseInt(customCondition.value) || 0;
+  const customDis = parseInt(customDiscount.value) || 0;
+
+  if (customChecked && customCon > 0 && customDis > 0) {
+    selectedCoupons.push([customDis, customCon]);
+  }
+
+  /* 조건 만족하는 전체 쿠폰 합 */
+  let totalConditionalCoupon = 0;
+  selectedCoupons.forEach(([discount, condition]) => {
+    if (totalBeforeCoupon >= condition) totalConditionalCoupon += discount;
+  });
+
+  /* 상품별 계산 */
+  let refundTotal = 0;
+  let keptTotal = 0;
+  let details = "<strong>상품별 환불 내역:</strong><br>";
+  let hasRefund = false;
+  let allRefunded = true;
+
+  rows.forEach(row => {
+    const name  = row.cells[0].querySelector("input").value || "상품";
+    const price = parseInt(row.cells[1].querySelector("input").value) || 0;
+    const disc  = parseInt(row.cells[2].querySelector("input").value) || 0;
+    const real  = Math.max(price - disc, 0);
+    const checked = row.cells[3].querySelector("input").checked;
+
+    const ratio = totalBeforeCoupon > 0 ? real / totalBeforeCoupon : 0;
+    const extraAlloc = Math.floor(extraCouponValue * ratio);
+    const pointsAlloc = Math.floor(points * ratio);
+
+    if (checked) {
+      const refundValue = Math.max(real - extraAlloc - pointsAlloc, 0);
+      refundTotal += refundValue;
+      details += `${name} (상품가 ${real.toLocaleString()} - 일반쿠폰 ${extraAlloc.toLocaleString()} - 적립금 ${pointsAlloc.toLocaleString()}) → 환불 ${refundValue.toLocaleString()}원<br>`;
+      hasRefund = true;
+    } else {
+      keptTotal += real;
+      allRefunded = false;
+    }
+  });
+
+  const resultContainer = document.getElementById("resultContainer");
+
+  if (!hasRefund) {
+    resultContainer.classList.add("empty");
+    resultContainer.innerHTML = `
+      <div class="result-top"><span class="result-label">Refund Breakdown</span></div>
+      <div class="result-text"><p class="result-empty">환불 상품이 없습니다.</p></div>`;
+    return;
+  }
+
+  details += `<br>환불 요청 상품 합계: ${refundTotal.toLocaleString()}원<br>`;
+
+  /* 조건부 쿠폰 유지/회수 */
+  let validCoupon = 0;
+  let couponMsg = "<br><strong>조건부 쿠폰 내역:</strong><br>";
+
+  selectedCoupons.forEach(([discount, condition]) => {
+    if (keptTotal >= condition) {
+      validCoupon += discount;
+      couponMsg += `쿠폰 ${discount.toLocaleString()}원 유지<br>`;
+    } else {
+      couponMsg += `<span style="color:#b91c1c">쿠폰 ${discount.toLocaleString()}원 무효화</span><br>`;
+    }
+  });
+
+  const lostCoupon = totalConditionalCoupon - validCoupon;
+  let finalRefund = refundTotal;
+
+  if (lostCoupon > 0) {
+    couponMsg += `<span style="color:#b91c1c">총 ${lostCoupon.toLocaleString()}원 회수</span><br>`;
+    finalRefund -= lostCoupon;
+  }
+
+  /* 배송비 */
+  const SHIPPING = 3000;
+  const FREE_LIMIT = 30000;
+
+  let shipMsg = "<br><strong>배송비 내역:</strong><br>";
+  let shipFee = 0;
+
+  if (reason === "buyer") {
+
+    if (returnShippingPayment === "deduct") {
+      shipFee += SHIPPING;
+      shipMsg += `반품배송비 차감: -${SHIPPING.toLocaleString()}원<br>`;
+    } else {
+      shipMsg += `반품배송비 선결제(환불 차감 없음)<br>`;
+    }
+
+    if (allRefunded && totalBeforeCoupon >= FREE_LIMIT) {
+      shipFee += SHIPPING;
+      shipMsg += `초도배송비 차감: -${SHIPPING.toLocaleString()}원<br>`;
+    } else if (keptTotal < FREE_LIMIT) {
+      shipFee += SHIPPING;
+      shipMsg += `남은 금액 ${keptTotal.toLocaleString()}원 < ${FREE_LIMIT.toLocaleString()}원 → 초도배송비 차감 -${SHIPPING.toLocaleString()}원<br>`;
+    }
+  } else {
+    shipMsg += "판매자 사유: 배송비 차감 없음<br>";
+  }
+
+  finalRefund -= shipFee;
+  finalRefund = Math.max(finalRefund, 0);
+
+  const finalHTML = details + couponMsg + shipMsg + `<br><strong>최종 환불액: <span style="color:#166534">${finalRefund.toLocaleString()}원</span></strong>`;
+
+  resultContainer.classList.remove("empty");
+  resultContainer.innerHTML = `
+    <div class="result-top">
+      <span class="result-label">Refund Breakdown</span>
+      <span class="badge-reason">${reason === "buyer" ? "구매자 사유" : "판매자 사유"}</span>
+    </div>
+    <div class="result-amount">${finalRefund.toLocaleString()} <span class="currency">원 환불 예정</span></div>
+    <div class="result-text">${finalHTML}</div>
+  `;
+}
+
+/* ------------------------------
+  초기화
+------------------------------ */
+function resetForm() {
+
+  points.value = 0;
+  extraCoupon.value = 0;
+  extraCouponType.value = "amount";
+  reason.value = "buyer";
+  returnShippingPayment.value = "deduct";
+
+  document.querySelectorAll('input[name="coupon"]').forEach(c => c.checked = false);
+
+  customCouponCheck.checked = false;
+  customCondition.value = "";
+  customDiscount.value = "";
+
+  const tbody = document.querySelector("#productTable tbody");
+  tbody.innerHTML = `
+    <tr>
+      <td><input type="text" placeholder="예: 상의"></td>
+      <td><input type="number" min="0"></td>
+      <td><input type="number" min="0"></td>
+      <td><input type="checkbox"></td>
+    </tr>
+    <tr>
+      <td><input type="text" placeholder="예: 하의"></td>
+      <td><input type="number" min="0"></td>
+      <td><input type="number" min="0"></td>
+      <td><input type="checkbox"></td>
+    </tr>
+  `;
+
+  const resultContainer = document.getElementById("resultContainer");
+  resultContainer.classList.add("empty");
+  resultContainer.innerHTML = `
+    <div class="result-top"><span class="result-label">Refund Breakdown</span></div>
+    <div class="result-text">
+      <p class="result-empty">환불할 상품을 체크하고 금액을 입력한 뒤 <strong>환불액 계산</strong>을 눌러주세요.</p>
+    </div>
+  `;
+}
+
+</script>
+
+</body>
+</html>
