@@ -685,6 +685,30 @@ body {
       <span class="coupon-pill">150k / -15k</span>
     </label>
   </div>
+
+            <!-- 새로 추가: 사용자 입력 기타 조건부 쿠폰 -->
+    <div class="coupon-item">
+      <input type="checkbox" id="customCouponCheck">
+      <div class="coupon-label-main">
+        <div style="margin-bottom:4px;">기타 조건부 쿠폰</div>
+        <div class="field-inline">
+          <input
+            type="number"
+            id="customCondition"
+            min="0"
+            placeholder="예: 70000 (구매금액 이상)"
+          >
+          <input
+            type="number"
+            id="customDiscount"
+            min="0"
+            placeholder="예: 7000 (할인금액)"
+          >
+        </div>
+      </div>
+      <span class="coupon-pill">custom</span>
+    </div>
+
 </fieldset>
 
       </section>
@@ -803,6 +827,15 @@ body {
   // 3. 선택된 조건부 쿠폰
   let selectedCoupons = Array.from(document.querySelectorAll('input[name="coupon"]:checked'))
     .map(c => c.value.split("-").map(Number)); // [discount, condition]
+  // 3-1. 사용자 입력 기타 조건부 쿠폰 추가
+  const customChecked = document.getElementById('customCouponCheck').checked;
+  const customCondition = parseInt(document.getElementById('customCondition').value) || 0;
+  const customDiscount = parseInt(document.getElementById('customDiscount').value) || 0;
+
+  // 체크되어 있고, 두 값이 모두 0보다 클 때만 유효 쿠폰으로 간주
+  if (customChecked && customCondition > 0 && customDiscount > 0) {
+    selectedCoupons.push([customDiscount, customCondition]);
+  }
 
   let totalConditionalCoupon = 0;
   selectedCoupons.forEach(([discount, condition]) => {
@@ -930,6 +963,7 @@ body {
   </script>
 </body>
 </html>
+
 
 
 
