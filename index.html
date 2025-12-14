@@ -40,7 +40,7 @@ body {
 
     .shell {
       width: 100%;
-      max-width: 960px;
+      max-width: 1400px;
       background:
         radial-gradient(circle at 0 0, rgba(255, 228, 230, 0.9), transparent 55%),
         linear-gradient(135deg, #ffffff, #fef9fb);
@@ -680,23 +680,9 @@ body {
   <label class="coupon-item">
     <input type="checkbox" name="couponCustom" />
     <span class="coupon-label-main" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-      <span style="font-size:12px;">구매금액</span>
       <input type="number" class="customCondition" min="0" placeholder="예: 70000" style="max-width:120px;">
       <span style="font-size:12px;">이상 시</span>
       <input type="number" class="customDiscount" min="0" placeholder="예: 8000" style="max-width:110px;">
-      <span style="font-size:12px;">원 할인</span>
-    </span>
-    <span class="coupon-pill">custom</span>
-  </label>
-
-  <!-- 2개째(옵션) -->
-  <label class="coupon-item">
-    <input type="checkbox" name="couponCustom" />
-    <span class="coupon-label-main" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-      <span style="font-size:12px;">구매금액</span>
-      <input type="number" class="customCondition" min="0" placeholder="예: 120000" style="max-width:120px;">
-      <span style="font-size:12px;">이상 시</span>
-      <input type="number" class="customDiscount" min="0" placeholder="예: 15000" style="max-width:110px;">
       <span style="font-size:12px;">원 할인</span>
     </span>
     <span class="coupon-pill">custom</span>
@@ -966,6 +952,7 @@ Array.from(document.querySelectorAll('input[name="couponCustom"]')).forEach(chk 
   </script>
 </body>
 </html>
+
 
 
 
