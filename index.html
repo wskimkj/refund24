@@ -1,975 +1,1988 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <link rel="icon" type="image/x-icon" href="android-chrome-512x512 (1).ico">
-  <meta charset="UTF-8">
-  <title>계산기</title>
+  <link rel="stylesheet" href="./css/common.css">
+  <meta charset="UTF-8" />
+  <title>어드민</title>
+  <link rel="icon" type="image/png" href="favicon.ico" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+
   <style>
-    :root {
-      --bg: #fdf2f8;               /* 페이지 전체 톤: 연핑크 */
-      --card: #ffffff;             /* 카드 배경: 화이트 */
-      --accent: #f472b6;           /* 메인 포인트: 파스텔 핑크 */
-      --accent-soft: #fb7185;      /* 서브 포인트: 코랄 핑크 */
-      --accent-light: #fecdd3;     /* 연한 핑크 */
-      --danger: #ef4444;
-      --text-main: #3f2a33;        /* 딥 로즈 브라운 */
-      --text-muted: #9f8594;       /* 핑크빛 회색 */
-      --border-subtle: rgba(248, 187, 208, 0.7);
-      --radius-lg: 18px;
-      --radius-md: 12px;
-      --shadow-soft: 0 20px 60px rgba(244, 114, 182, 0.25);
-      --transition-fast: 0.18s ease-out;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root{
+      --shell-bg: rgba(255,255,255,0.98);
+      --shell-shadow: 0 24px 60px rgba(15,23,42,.22);
+      --card-shadow:
+        0 18px 40px rgba(148, 163, 184, 0.28),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+      --card-bg: radial-gradient(circle at top left, #fef3ff 0%, #ffffff 50%, #f1f5f9 100%);
+
+      --main-sidebar-bg: linear-gradient(180deg, #b79cff 0%, #ff8fb8 52%, #ffd6e7 100%);
+      --nav-text: #f9fafb;
+      --nav-chip-bg: rgba(255,255,255,0.18);
+      --nav-active-chip-bg: #ffffff;
+      --nav-active-color: #6d28d9;
+
+      --sub-sidebar-bg:
+        radial-gradient(circle at top left, rgba(255, 182, 213, 0.55), rgba(170, 190, 255, 0.55)),
+        linear-gradient(180deg, rgba(15,23,42,0.16), rgba(15,23,42,0.26));
+      --sub-title-color: #fff7fd;
+
+      /* glass calendar */
+      --glass-bg: rgba(255,255,255,0.62);
+      --glass-border: rgba(255,255,255,0.70);
+      --glass-shadow: 0 18px 50px rgba(15,23,42,0.16);
+      --ink: #0f172a;
+      --muted: rgba(15,23,42,0.55);
+      --accent: #7c3aed;
+      --accent2: #ec4899;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
-  background: #ffffff; /* 완전 흰색 */
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 16px;
-}
-
-    .shell {
-      width: 100%;
-      max-width: 1200px;
+    body{
+      min-height: 100vh;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
       background:
-        radial-gradient(circle at 0 0, rgba(255, 228, 230, 0.9), transparent 55%),
-        linear-gradient(135deg, #ffffff, #fef9fb);
-      border-radius: 26px;
-      padding: 26px 24px 28px;
-      border: 1px solid rgba(248, 187, 208, 0.8);
-      box-shadow: var(--shadow-soft);
-      backdrop-filter: blur(10px);
-    }
-
-    @media (min-width: 880px) {
-      .shell {
-        padding: 32px 32px 32px;
-      }
-    }
-
-    header.app-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 22px;
-    }
-
-    .title-block {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .logo-pill {
-      width: 42px;
-      height: 42px;
-      border-radius: 999px;
-      background: conic-gradient(from 180deg, #fb7185, #f97373, #f472b6, #fb7185);
-      padding: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 18px 35px rgba(244, 114, 182, 0.55);
-    }
-
-    .logo-pill-inner {
-      width: 100%;
-      height: 100%;
-      border-radius: inherit;
-      background: radial-gradient(circle at 30% 30%, #ffffff, #ffe4ef);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      color: #9f1239;
-      font-size: 20px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      color: #7f1d3a;
-    }
-
-    h1 span.sub {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--accent-soft);
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(254, 226, 226, 0.9);
-      border: 1px solid rgba(248, 113, 113, 0.55);
-    }
-
-    .header-desc {
-      margin-top: 6px;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .meta {
-      font-size: 12px;
-      color: var(--text-muted);
-      text-align: right;
-    }
-
-    .meta-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: flex-end;
-    }
-
-    .meta-pill {
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(248, 187, 208, 0.8);
-      background: rgba(255, 247, 250, 0.95);
-      color: #7f1d3a;
-    }
-
-    @media (max-width: 720px) {
-      header.app-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .meta {
-        text-align: left;
-      }
-      .meta-pills {
-        justify-content: flex-start;
-      }
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
-      gap: 18px;
-    }
-
-    @media (max-width: 860px) {
-      .layout {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    .card {
-      background:
-        radial-gradient(circle at 0 0, rgba(255, 241, 242, 0.9), transparent 60%),
-        linear-gradient(145deg, #ffffff, #fdf2f8);
-      border-radius: 18px;
-      padding: 16px 16px 18px;
-      border: 1px solid var(--border-subtle);
-      position: relative;
+        radial-gradient(circle at top left, rgba(236,72,153,.35), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(96,165,250,.28), transparent 55%),
+        radial-gradient(circle at top right, rgba(124,58,237,.22), transparent 55%),
+        #fdf2ff;
       overflow: hidden;
-    }
-
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      border: 1px solid transparent;
-      background: linear-gradient(135deg, rgba(244, 114, 182, 0.3), transparent);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity var(--transition-fast);
-    }
-
-    .card:hover::before {
-      opacity: 0.8;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .card-title {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .card-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 15px rgba(244, 114, 182, 0.95);
-    }
-
-    .card-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .field-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 4px;
-    }
-
-    @media (max-width: 720px) {
-      .field-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .field-label {
-      font-size: 12px;
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
-      color: var(--text-muted);
-    }
-
-    .field-label span.main {
-      color: var(--text-main);
-      font-weight: 500;
-    }
-
-    .field-label span.hint {
-      font-size: 11px;
-      opacity: 0.8;
-    }
-
-    .field-inline {
-      display: flex;
-      gap: 6px;
-      align-items: stretch;
-    }
-
-    .field-inline select {
-      max-width: 72px;
-    }
-
-    input[type="number"],
-    input[type="text"],
-    select {
-      border-radius: 10px;
-      border: 1px solid rgba(248, 187, 208, 0.9);
-      background: rgba(255, 255, 255, 0.95);
-      color: var(--text-main);
-      padding: 8px 10px;
-      font-size: 13px;
-      outline: none;
-      width: 100%;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
-    }
-
-    input[type="number"] {
-      text-align: right;
-    }
-
-    input::placeholder {
-      color: #d1a5b8;
-    }
-
-    input:focus,
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(244, 114, 182, 0.7);
-      transform: translateY(-1px);
-      background: #ffffff;
-    }
-
-    select {
-      cursor: pointer;
-    }
-
-    fieldset {
-      border-radius: 12px;
-      border: 1px dashed rgba(248, 187, 208, 0.9);
-      padding: 10px 12px 10px;
-      margin: 12px 0 0;
-      background: rgba(255, 247, 250, 0.95);
-    }
-
-    legend {
-      padding: 0 6px;
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .coupon-list {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-top: 4px;
-    }
-
-    .coupon-item {
-      font-size: 12px;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .coupon-item input[type="checkbox"] {
-      accent-color: var(--accent);
-      width: 15px;
-      height: 15px;
-      cursor: pointer;
-    }
-
-    .coupon-label-main {
-      flex: 1;
-    }
-
-    .coupon-pill {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid rgba(248, 187, 208, 0.9);
-      color: #9f1239;
-      background: rgba(255, 241, 242, 0.95);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .table-wrapper {
-      margin-top: 4px;
-      border-radius: 12px;
-      border: 1px solid rgba(248, 187, 208, 0.9);
-      overflow: hidden;
-      background: #fff7fb;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 12px;
-    }
-
-    thead {
-      background: linear-gradient(135deg, #f9a8d4, #fb7185);
-      color: #fdf2f8;
-    }
-
-    th, td {
-      padding: 8px 10px;
-      text-align: center;
-      border-bottom: 1px solid rgba(248, 187, 208, 0.8);
-    }
-
-    th {
-      font-weight: 600;
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    tbody tr:nth-child(odd) {
-      background: #ffffff;
-    }
-
-    tbody tr:nth-child(even) {
-      background: #fff1f5;
-    }
-
-    tbody tr:hover {
-      background: rgba(251, 207, 232, 0.6);
-    }
-
-    td input[type="text"],
-    td input[type="number"] {
-      width: 100%;
-      padding: 6px 7px;
-      font-size: 12px;
-      border-radius: 8px;
-      border: 1px solid rgba(248, 187, 208, 0.9);
-      background: rgba(255, 255, 255, 0.98);
-    }
-
-    td input[type="checkbox"] {
-      accent-color: var(--accent);
-      width: 15px;
-      height: 15px;
-      cursor: pointer;
-    }
-
-    .table-hint {
-      margin-top: 6px;
-      font-size: 11px;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
-    .actions {
-      margin-top: 12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    button {
-      border-radius: 999px;
-      border: 1px solid transparent;
-      font-size: 13px;
-      padding: 8px 18px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      font-weight: 500;
-      transition: background var(--transition-fast), color var(--transition-fast),
-                  box-shadow var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
-      background: transparent;
-      color: var(--text-main);
-    }
-
-    button span.icon {
       font-size: 14px;
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-soft));
-      color: #fff7fb;
-      box-shadow: 0 14px 32px rgba(244, 114, 182, 0.55);
+    .app-shell{
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      border-radius: 18px;
+      background: var(--shell-bg);
+      box-shadow: var(--shell-shadow);
+      overflow: hidden;
     }
 
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 16px 40px rgba(244, 114, 182, 0.7);
-      filter: brightness(1.03);
+    /* ===== main sidebar ===== */
+    .main-sidebar{
+      position:absolute; top:0; left:0;
+      width:82px; height:100%;
+      background: var(--main-sidebar-bg);
+      display:flex; flex-direction:column; align-items:center;
+      padding: 16px 0;
+      z-index: 50;
     }
 
-    .btn-ghost {
-      border-color: rgba(248, 187, 208, 0.9);
-      background: #fff7fb;
-      color: var(--text-muted);
+    .nav-list{
+      flex:1;
+      display:flex; flex-direction:column;
+      align-items:center;
+      gap: 10px;
+      margin-top: 4px;
     }
 
-    .btn-ghost:hover {
-      color: var(--text-main);
-      border-color: var(--accent);
-      box-shadow: 0 10px 26px rgba(248, 187, 208, 0.7);
-      transform: translateY(-1px);
-    }
-
-    .btn-danger {
-      border-color: rgba(239, 68, 68, 0.9);
-      color: #7f1d1d;
-      background: #fee2e2;
-    }
-
-    .btn-danger:hover {
-      background: #fecaca;
-      box-shadow: 0 12px 30px rgba(248, 113, 113, 0.6);
-      transform: translateY(-1px);
-    }
-
-    .result-container {
-      margin-top: 10px;
-      border-radius: 16px;
-      padding: 14px 14px 12px;
-      background: radial-gradient(circle at 0 0, rgba(187, 247, 208, 0.8), #fff7fb);
-      border: 1px solid rgba(22, 163, 74, 0.35);
-      box-shadow: 0 18px 45px rgba(34, 197, 94, 0.35);
-      font-size: 12px;
-      max-height: 260px;
-      overflow: auto;
-    }
-
-    .result-container.empty {
-      background: rgba(255, 247, 250, 0.95);
-      border-style: dashed;
-      border-color: rgba(248, 187, 208, 0.9);
-      box-shadow: none;
-    }
-
-    .result-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .result-label {
+    .nav-item{
+      width:60px;
+      border:none;
+      background:transparent;
+      color: var(--nav-text);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 4px;
+      cursor:pointer;
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.11em;
-      text-transform: uppercase;
-      color: #166534;
     }
 
-    .badge-reason {
-      font-size: 10px;
-      padding: 2px 7px;
+    .nav-icon-wrap{
+      width:40px;height:40px;
+      border-radius:18px;
+      background: var(--nav-chip-bg);
+      display:flex;align-items:center;justify-content:center;
+      box-shadow: 0 6px 14px rgba(15,23,42,0.20);
+      transition: all .2s ease;
+    }
+
+    .nav-item i{ font-size: 20px; }
+    .nav-item span{ opacity:.95; }
+
+    .nav-item.active .nav-icon-wrap{
+      background: var(--nav-active-chip-bg);
+      color: var(--nav-active-color);
+      box-shadow: 0 10px 22px rgba(124,58,237,.16);
+    }
+
+    .nav-item:hover .nav-icon-wrap{
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(15,23,42,.18);
+    }
+
+    /* ===== ADMIN button -> calendar toggle ===== */
+    .nav-footer-btn{
+      margin-top: auto;
+      margin-bottom: 6px;
+      border: none;
+      background: rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.92);
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      background: rgba(255, 255, 255, 0.9);
-      color: var(--text-muted);
-    }
-
-    .result-amount {
-      font-size: 18px;
-      font-weight: 700;
-      color: #166534;
-      margin-bottom: 4px;
-    }
-
-    .result-amount span.currency {
+      padding: 8px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       font-size: 11px;
-      opacity: 0.9;
-      margin-left: 3px;
+      font-weight: 900;
+      box-shadow: 0 10px 22px rgba(15,23,42,0.22);
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .nav-footer-btn i{ font-size: 16px; }
+    .nav-footer-btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.26);
+      box-shadow: 0 14px 28px rgba(15,23,42,0.22);
     }
 
-    .result-text {
-      line-height: 1.5;
-      color: var(--text-main);
+    /* ===== sub sidebar (google sheets) ===== */
+    .sub-sidebar{
+      position:absolute;
+      top: 15%;
+      bottom: 25%;
+      left: 96px;
+      width: 220px;
+      border-radius: 24px;
+      padding: 12px 12px 10px;
+      background: var(--sub-sidebar-bg);
+      box-shadow: 0 20px 40px rgba(15,23,42,0.35), 0 0 0 1px rgba(255,255,255,0.55);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display:flex; flex-direction:column;
+      opacity:0;
+      transform: translateX(-16px);
+      pointer-events:none;
+      transition: all .22s ease;
+      z-index: 40;
     }
-
-    .result-text strong {
-      color: #166534;
+    .sub-sidebar.visible{
+      opacity:1;
+      transform: translateX(0);
+      pointer-events:auto;
     }
-
-    .result-empty {
+    .sub-title{
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--sub-title-color);
+      margin-bottom: 6px;
+    }
+    .sub-list{
+      display:flex; flex-direction:column;
+      gap: 6px;
+      overflow-y:auto;
+    }
+    .sub-item{
+      border:none;
+      width:100%;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      color: #f9fafb;
       font-size: 12px;
-      color: var(--text-muted);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      transition: all .18s ease;
+      text-align:left;
+    }
+    .sub-item i{ font-size:16px; }
+    .sub-item:hover{
+      background: rgba(255,255,255,0.28);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(15,23,42,.20);
+    }
+    .sub-item.active{
+      background:#fff;
+      color: var(--nav-active-color);
+      box-shadow: 0 12px 20px rgba(124,58,237,.18);
+    }
+
+    /* ===== main content ===== */
+    .content{
+      position:absolute;
+      top:0; left:82px; right:0; bottom:0;
+      padding: 10px 14px 14px;
+      z-index: 1;
+    }
+    .card{
+      width:100%;
+      height:100%;
+      border-radius: 24px;
+      background: var(--card-bg);
+      box-shadow: var(--card-shadow);
+      padding: 10px;
+    }
+    iframe{
+      width:100%;
+      height:100%;
+      border:none;
+      border-radius:16px;
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.55);
+      box-shadow: 0 10px 26px rgba(15,23,42,.12);
+    }
+
+    /* ===== calendar widget (glass) ===== */
+    .calendar-widget{
+      position:absolute;
+      left: 96px;
+      bottom: 20px;
+      width: 310px;
+      border-radius: 24px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--ink);
+      padding: 12px;
+      box-shadow: var(--glass-shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 35;
+
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+      pointer-events:none;
+      transition: all .22s ease;
+    }
+    .calendar-widget.visible{
+      opacity:1;
+      transform: translateY(0) scale(1);
+      pointer-events:auto;
+    }
+
+    .calendar-header{
+      display:flex; align-items:flex-start; justify-content:space-between;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+    .calendar-title{ font-size: 14px; font-weight: 900; letter-spacing: -0.2px; }
+    .calendar-left{ display:flex; flex-direction:column; }
+
+    .calendar-right{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap: wrap;
+      justify-content:flex-end;
+    }
+
+    /* view toggle */
+    .cal-view-seg{
+      display:flex;
+      gap:6px;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid rgba(15,23,42,0.08);
+    }
+    .cal-view-seg button{
+      border:none;
+      cursor:pointer;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(15,23,42,0.72);
+    }
+    .cal-view-seg button.active{
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 8px 18px rgba(15,23,42,0.10);
+      color: var(--accent);
+    }
+
+    /* bell (also sheet link) */
+    .today-event-icon{
+      position:relative;
+      width:30px;height:30px;border-radius:999px;
+      background: rgba(255,255,255,0.92);
+      display:inline-flex;align-items:center;justify-content:center;
+      box-shadow: 0 10px 18px rgba(15,23,42,0.10);
+      transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+      cursor: pointer;
+      user-select:none;
+    }
+    .today-event-icon:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 16px 24px rgba(15,23,42,0.12);
+    }
+    .today-event-icon i{ font-size:16px; color: var(--accent2); }
+    .today-event-icon.dim{ opacity: .75; }
+    .today-event-badge{
+      position:absolute; top:-4px; right:-4px;
+      min-width:16px;height:16px;border-radius:999px;
+      background:#ef4444;
+      color:#fff;
+      border:2px solid rgba(255,255,255,0.9);
+      font-size:10px;
+      font-weight:900;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 0 5px;
+    }
+
+    .calendar-weekdays, .calendar-days{
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      text-align:center;
+    }
+    .calendar-weekdays{
+      margin: 6px 0 8px;
+    }
+    .calendar-weekdays span{
+      font-size: 10px;
+      font-weight: 800;
+      color: rgba(15,23,42,0.55);
+    }
+
+    .calendar-day{
+      position: relative;
+      font-size: 11px;
+      padding: 7px 0;
+      border-radius: 12px;
+      color: rgba(15,23,42,0.82);
+      user-select:none;
+      cursor: pointer;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid rgba(15,23,42,0.08);
+      box-shadow: 0 10px 18px rgba(15,23,42,0.06);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .calendar-day:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 16px 24px rgba(15,23,42,0.08);
+    }
+    .calendar-day.other-month{ opacity:.35; cursor: default; }
+    .calendar-day.today{
+      outline: 2px solid rgba(124,58,237,0.35);
+      background: rgba(255,255,255,0.88);
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    .day-badge{
+      position:absolute;
+      top:-6px; right:-6px;
+      min-width:18px; height:18px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: rgba(124,58,237,0.92);
+      color:#fff;
+      border: 2px solid rgba(255,255,255,0.95);
+      font-size:9px;
+      font-weight:900;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 10px 18px rgba(124,58,237,0.20);
+    }
+    .calendar-day.has-event .day-badge{ display:inline-flex; }
+
+    /* ===== date popup (preview) ===== */
+    .date-popup{
+      position:absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(100% + 10px);
+      width: 300px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 22px 50px rgba(15,23,42,.22);
+      border: 1px solid rgba(255,255,255,0.80);
+      padding: 10px;
+      display:none;
+      z-index: 80;
+    }
+    .date-popup.open{ display:block; }
+
+    .date-popup::after{
+      content:"";
+      position:absolute;
+      bottom:-8px;
+      left:50%;
+      transform: translateX(-50%);
+      border-width: 8px 8px 0 8px;
+      border-style: solid;
+      border-color: rgba(255,255,255,0.88) transparent transparent transparent;
+      filter: drop-shadow(0 6px 10px rgba(15,23,42,0.12));
+    }
+
+    .date-popup-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 8px;
+      margin-bottom:8px;
+    }
+    .date-popup-head strong{
+      font-size:13px;
+      font-weight:1000;
+      color: rgba(15,23,42,0.92);
+      letter-spacing: -0.2px;
+    }
+    .date-popup-close{
+      border:none;
+      width:30px;height:30px;
+      border-radius: 999px;
+      cursor:pointer;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 12px 18px rgba(15,23,42,0.10);
+      display:flex; align-items:center; justify-content:center;
+      color: rgba(15,23,42,0.70);
+    }
+
+    .date-popup-list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      max-height: 320px;
+      overflow:auto;
+      padding-right: 4px;
+    }
+
+    .mini-event{
+      border-radius: 16px;
+      padding: 10px;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(15,23,42,0.08);
+      box-shadow: 0 10px 18px rgba(15,23,42,0.06);
+    }
+    .mini-event .mall{
+      font-size: 11px;
+      font-weight: 1000;
+      color: var(--accent);
+    }
+
+    .mini-event .event-text{
+      margin-top: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      color: rgba(15,23,42,0.92);
+      line-height: 1.45;
+      max-height: 110px;
+      overflow: auto;
+      padding-right: 6px;
+      word-break: break-word;
+    }
+
+    .mini-event .meta{
+      margin-top: 8px;
+      font-size: 10px;
+      color: rgba(15,23,42,0.55);
+      font-weight: 900;
+    }
+
+    /* ===== ITEM(접기/펼치기) ===== */
+    .item-box{
+      margin-top: 8px;
+      padding: 6px 8px;
+      border-radius: 12px;
+      background: rgba(124,58,237,0.08);
+      border: 1px solid rgba(124,58,237,0.18);
+    }
+    .item-head{
+      width: 100%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 8px;
+      padding: 0;
+    }
+    .item-label{
+      font-size: 8px;
+      font-weight: 900;
+      color: #7c3aed;
+    }
+    .item-caret{
+      font-size: 14px;
+      color: rgba(124,58,237,0.85);
+      transition: transform .15s ease;
+    }
+    .item-head[aria-expanded="true"] .item-caret{
+      transform: rotate(180deg);
+    }
+    .item-text{
+      margin-top: 6px;
+      font-size: 8px;
+      line-height: 1.4;
+      color: rgba(15,23,42,0.88);
+      max-height: 44px;
+      overflow: auto;
+      word-break: break-word;
+      padding-right: 6px;
+    }
+    .item-text.is-collapsed{ display:none; }
+
+    /* ===== phone widget (glass) ===== */
+    .phone-widget{
+      position:absolute;
+      left: 96px;
+      bottom: 20px;
+      width: 310px;
+      border-radius: 24px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--ink);
+      padding: 12px;
+      box-shadow: var(--glass-shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 36;
+
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+      pointer-events:none;
+      transition: all .22s ease;
+    }
+    .phone-widget.visible{
+      opacity:1;
+      transform: translateY(0) scale(1);
+      pointer-events:auto;
+    }
+    .phone-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom: 10px;
+    }
+    .phone-title{
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+    }
+    .phone-close{
+      border:none;
+      width:30px;height:30px;
+      border-radius:999px;
+      cursor:pointer;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 12px 18px rgba(15,23,42,0.10);
+      display:flex;align-items:center;justify-content:center;
+      color: rgba(15,23,42,0.70);
+    }
+    .phone-input{
+      width:100%;
+      border:none;
+      outline:none;
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.85);
+      border: 1px solid rgba(15,23,42,0.08);
+      box-shadow: 0 10px 18px rgba(15,23,42,0.06);
+      font-weight: 800;
+    }
+    .phone-row{
+      margin-top: 10px;
+      display:flex;
+      gap: 8px;
+      align-items:center;
+    }
+    .phone-output{
+      flex:1;
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(15,23,42,0.08);
+      font-weight: 900;
+      color: rgba(15,23,42,0.86);
+      user-select: none;
+      cursor: copy;
+    }
+    .phone-copy{
+      border:none;
+      cursor:pointer;
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 10px 18px rgba(15,23,42,0.10);
+      font-weight: 900;
+      color: var(--accent);
+    }
+    .phone-copy:active{ transform: translateY(1px); }
+    .phone-hint{
+      margin-top: 8px;
+      font-size: 10px;
+      font-weight: 800;
+      color: rgba(15,23,42,0.55);
+    }
+
+    /* ===== account widget (glass) ===== */
+    .account-widget{
+      position:absolute;
+      left: 96px;
+      bottom: 20px;
+      width: 380px;
+      border-radius: 24px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--ink);
+      padding: 12px;
+      box-shadow: var(--glass-shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 38;
+
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+      pointer-events:none;
+      transition: all .22s ease;
+    }
+    .account-widget.visible{
+      opacity:1;
+      transform: translateY(0) scale(1);
+      pointer-events:auto;
+    }
+    .account-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom: 10px;
+    }
+    .account-title{
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+    }
+    .account-close{
+      border:none;
+      width:30px;height:30px;
+      border-radius:999px;
+      cursor:pointer;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 12px 18px rgba(15,23,42,0.10);
+      display:flex;align-items:center;justify-content:center;
+      color: rgba(15,23,42,0.70);
+    }
+    .account-row{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+    }
+    .account-input{
+      flex: 1;
+      border:none;
+      outline:none;
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.85);
+      border: 1px solid rgba(15,23,42,0.08);
+      box-shadow: 0 10px 18px rgba(15,23,42,0.06);
+      font-weight: 800;
+    }
+    .account-search{
+      border:none;
+      cursor:pointer;
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 10px 18px rgba(15,23,42,0.10);
+      font-weight: 900;
+      color: var(--accent);
+    }
+    .account-search:active{ transform: translateY(1px); }
+    .account-toggle{
+      margin-top: 8px;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 900;
+      color: rgba(15,23,42,0.60);
+      user-select:none;
+    }
+    .account-toggle input{ accent-color: var(--accent); }
+    .account-meta{
+      margin-top: 8px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+    }
+    .account-badge{
+      font-size: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(124,58,237,0.16);
+      border: 1px solid rgba(124,58,237,0.22);
+      color: var(--accent);
+      font-weight: 1000;
+      letter-spacing: 0.08em;
+    }
+    .account-count{
+      font-size: 11px;
+      font-weight: 1000;
+      color: rgba(15,23,42,0.62);
+    }
+    .account-result{
+      margin-top: 8px;
+      max-height: 360px;
+      overflow:auto;
+      padding-right: 4px;
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .account-card{
+      border-radius: 16px;
+      padding: 10px;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(15,23,42,0.08);
+      box-shadow: 0 10px 18px rgba(15,23,42,0.06);
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      min-width: 0;
+    }
+    .account-card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap: 8px;
+    }
+    .account-site{
+      font-size: 12px;
+      font-weight: 1000;
+      color: rgba(15,23,42,0.92);
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+      flex: 1;
+    }
+    .account-group{
+      font-size: 10px;
+      font-weight: 1000;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(236,72,153,0.14);
+      border: 1px solid rgba(236,72,153,0.22);
+      color: rgba(236,72,153,0.95);
+      white-space: nowrap;
+    }
+    .account-fields{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .account-chip{
+      display:flex;
+      align-items:center;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(15,23,42,0.08);
+      box-shadow: 0 6px 12px rgba(15,23,42,0.06);
+      min-width: 0;
+    }
+    .account-chip .k{
+      font-size: 9px;
+      font-weight: 1000;
+      color: rgba(15,23,42,0.55);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .account-chip .v{
+      font-size: 10px;
+      font-weight: 1000;
+      color: rgba(15,23,42,0.88);
+      max-width: 140px;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+    }
+    .account-chip .copy{
+      border:none;
+      cursor:pointer;
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 10px;
+      font-weight: 1000;
+      background: rgba(15,23,42,0.06);
+      color: rgba(15,23,42,0.70);
+      white-space: nowrap;
+    }
+    .account-chip .copy:hover{
+      background: rgba(15,23,42,0.10);
+      color: rgba(15,23,42,0.92);
+    }
+    .account-empty{
+      grid-column: 1 / -1;
+      padding: 10px 4px;
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(15,23,42,0.55);
+      text-align:center;
+    }
+    .account-toast{
+      position: absolute;
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%);
+      background: rgba(15,23,42,0.92);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 7px 12px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .16s ease, transform .16s ease;
+      box-shadow: 0 14px 28px rgba(15,23,42,0.22);
+    }
+    .account-toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    @media (max-width: 900px) {
+      body{ padding:10px; overflow:auto; }
+      .app-shell{ height:auto; min-height: calc(100vh - 20px); }
+      .main-sidebar{ position:fixed; height: calc(100vh - 20px); }
+      .content{
+        position:relative;
+        left:82px;
+        width: calc(100% - 82px);
+        height:auto;
+        min-height:70vh;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div class="shell">
-    <header class="app-header">
-      <div class="title-block">
-        <div class="logo-pill">
-          <div class="logo-pill-inner">₩</div>
+<div class="app-shell">
+
+  <!-- main sidebar -->
+  <nav class="main-sidebar">
+    <div class="nav-list">
+      <button class="nav-item active" data-id="search" data-href="https://wskimkj.github.io/search/">
+        <div class="nav-icon-wrap"><i class='bx bx-search'></i></div>
+        <span> 상품</span>
+      </button>
+      <button class="nav-item" data-id="order" data-href="https://wskimkj.github.io/return-inf/">
+        <div class="nav-icon-wrap"><i class='bx bx-cart'></i></div>
+        <span> 주문 </span>
+      </button>
+      <button class="nav-item" data-id="tracking" data-href="https://wskimkj.github.io/tracking/">
+        <div class="nav-icon-wrap"><i class='bx bx-package'></i></div>
+        <span> 배송</span>
+      </button>
+      <button class="nav-item" data-id="template" data-href="https://wskimkj.github.io/trim2/">
+        <div class="nav-icon-wrap"><i class='bx bx-message'></i></div>
+        <span> 템플릿</span>
+      </button>
+      <button class="nav-item" data-id="refund" data-href="https://wskimkj.github.io/refund24/">
+        <div class="nav-icon-wrap"><i class='bx bx-calculator'></i></div>
+        <span> 환불 </span>
+      </button>
+      <button class="nav-item" data-id="account" data-href="https://wskimkj.github.io/account/">
+        <div class="nav-icon-wrap"><i class='bx bx-lock'></i></div>
+        <span> 계정</span>
+      </button>
+      <button class="nav-item" data-id="memo" data-href="https://wskimkj.github.io/memo/">
+        <div class="nav-icon-wrap"><i class='bx bx-pen'></i></div>
+        <span> 메모</span>
+      </button>
+      <button class="nav-item" id="googleBtn" data-id="google">
+        <div class="nav-icon-wrap"><i class='bx bx-spreadsheet'></i></div>
+        <span> 시트 </span>
+      </button>
+    </div>
+
+    <button class="nav-footer-btn" id="phoneFormatBtn" type="button" title="전화번호 포맷">
+      <i class='bx bx-phone'></i>
+      <span>Phone</span>
+    </button>
+
+    <!-- ✅ account widget toggle -->
+    <button class="nav-footer-btn" id="accountWidgetBtn" type="button" title="계정 조회">
+      <i class='bx bx-key'></i>
+      <span>Account</span>
+    </button>
+
+    <button class="nav-footer-btn" id="adminEventBtn" type="button" title="이벤트 보기">
+      <i class='bx bx-calendar-event'></i>
+      <span>event</span>
+    </button>
+  </nav>
+
+  <!-- sub sidebar -->
+  <aside class="sub-sidebar" id="subSidebar">
+    <div class="sub-title">구글 시트</div>
+    <div class="sub-list">
+      <button class="sub-item google-child" data-href="https://docs.google.com/spreadsheets/d/1_L12NKkBVU4c5xDPrYLUQRnSUG2NoAwYGWIfPDVO3bM/edit?gid=366983013#gid=366983013">
+        <i class='bx bx-chevron-right'></i><span>개인시트</span>
+      </button>
+      <button class="sub-item google-child" data-href="https://docs.google.com/spreadsheets/d/1_Bxfag-90U6u-6JbhxNqeoD9vRns-CpPeXPIJYO1Z5o/edit?gid=1265906605#gid=1265906605">
+        <i class='bx bx-chevron-right'></i><span>반품</span>
+      </button>
+      <button class="sub-item google-child" data-href="https://docs.google.com/spreadsheets/d/1Cjoo-x9lBA5pFtGoxftdAxdoKrzt770XcPGeXOidPiI/edit?gid=0#gid=0">
+        <i class='bx bx-chevron-right'></i><span>Team.반품</span>
+      </button>
+      <button class="sub-item google-child" data-href="https://docs.google.com/spreadsheets/d/1LPy69E2yPTaSwxFAYrX6qV0BZx1tW0YdonLRNqeo5Vc/edit?gid=0#gid=0">
+        <i class='bx bx-chevron-right'></i><span>Team.물류</span>
+      </button>
+      <button class="sub-item google-child" data-href="https://docs.google.com/spreadsheets/d/1cAXTlsGoK8FNEZ-7PaR7dfLjykPfCqLOIcyBqqdu3wY/edit?gid=925106579#gid=925106579">
+        <i class='bx bx-chevron-right'></i><span>Team.업무</span>
+      </button>
+      <button class="sub-item google-child" data-href="https://docs.google.com/spreadsheets/d/1dvTCc9JlORbvc29rQ_ai-z8RQSPibQUPHvjrH4iuhFk/edit?gid=1184149787#gid=1184149787">
+        <i class='bx bx-chevron-right'></i><span>Team.주간</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- main content -->
+  <div class="content">
+    <div class="card">
+      <iframe src="https://wskimkj.github.io/search/" id="mainFrame"></iframe>
+    </div>
+  </div>
+
+  <!-- phone widget -->
+  <div class="phone-widget" id="phoneWidget">
+    <div class="phone-head">
+      <div class="phone-title">전화번호 포맷</div>
+      <button class="phone-close" id="phoneClose" type="button" aria-label="닫기">
+        <i class='bx bx-x' style="font-size:18px;"></i>
+      </button>
+    </div>
+
+    <div class="phone-body">
+      <input id="phoneInput" class="phone-input" placeholder="+821000000000" />
+      <div class="phone-row">
+        <div id="phoneOutput" class="phone-output">010-0000-0000</div>
+        <button id="phoneCopy" class="phone-copy" type="button">복사</button>
+      </div>
+      <div id="phoneHint" class="phone-hint">입력하면 자동으로 010-XXXX-XXXX로 변환돼요.</div>
+    </div>
+  </div>
+
+  <!-- ✅ account widget -->
+  <div class="account-widget" id="accountWidget">
+    <div class="account-head">
+      <div class="account-title">계정 조회</div>
+      <button class="account-close" id="accountClose" type="button" aria-label="닫기">
+        <i class='bx bx-x' style="font-size:18px;"></i>
+      </button>
+    </div>
+
+    <div class="account-body">
+      <div class="account-row">
+        <input id="accountQuery" class="account-input" placeholder="예) 스마트스토어 / 쿠팡 / 11번가 ..." />
+        <button id="accountSearchBtn" class="account-search" type="button">검색</button>
+      </div>
+
+      <label class="account-toggle" title="기본은 OR, 체크하면 AND">
+        <input id="accountMatchAll" type="checkbox" />
+        모든 키워드 일치(AND)
+      </label>
+
+      <div class="account-meta">
+        <span class="account-badge">ACCOUNT</span>
+        <span id="accountCount" class="account-count">0건</span>
+      </div>
+
+      <div id="accountResult" class="account-result">
+        <div class="account-empty">데이터 불러오는 중...</div>
+      </div>
+
+      <div id="accountToast" class="account-toast">복사되었습니다</div>
+    </div>
+  </div>
+
+  <!-- calendar widget -->
+  <div class="calendar-widget" id="calendarWidget">
+    <div class="calendar-header">
+      <div class="calendar-left">
+        <div class="calendar-title" id="calendarMonthLabel">December 2025</div>
+      </div>
+
+      <div class="calendar-right">
+        <div class="cal-view-seg" id="calViewSeg">
+          <button type="button" data-view="week">주</button>
+          <button type="button" data-view="month">월</button>
         </div>
-        <div>
-          <h1>
-           계산기
-            <span class="sub">환불 금액</span>
-          </h1>
-          <p class="header-desc">
-          </p>
+
+        <div class="today-event-icon dim" id="todayEventIcon" title="이벤트 시트 열기">
+          <i class='bx bx-bell'></i>
+          <div class="today-event-badge" id="todayBadge"></div>
         </div>
       </div>
-      <div class="meta">
-        <div class="meta-pills">
-          <span class="meta-pill">쿠폰 조건</span>
-          <span class="meta-pill">배송비 환불</span>
-        </div>
+    </div>
+
+    <div class="date-popup" id="datePopup">
+      <div class="date-popup-head">
+        <strong id="popupDateLabel">12/15(월)</strong>
+        <button class="date-popup-close" id="popupClose" type="button" aria-label="닫기">
+          <i class='bx bx-x' style="font-size:18px;"></i>
+        </button>
       </div>
-    </header>
-
-    <div class="layout">
-      <!-- 왼쪽 카드: 결제 정보 & 쿠폰 -->
-      <section class="card">
-        <div class="card-header">
-          <div class="card-title">
-            Payment Summary
-            <span class="card-dot"></span>
-          </div>
-          <div class="card-sub"></div>
-        </div>
-
-<div class="field-grid">
-  <!-- 총 적립금 -->
-  <div class="field">
-    <div class="field-label">
-      <span class="main">① 사용 적립금</span>
-      <span class="hint">(원)</span>
+      <div class="date-popup-list" id="popupEventList"></div>
     </div>
-    <input type="number" id="points" value="0" min="0" placeholder="예: 5,000">
-  </div>
 
-  <!-- 추가 쿠폰 (금액 / %) -->
-  <div class="field">
-    <div class="field-label">
-      <span class="main"> ② 추가 할인</span>
-      <span class="hint">  </span>
+    <div class="calendar-weekdays">
+      <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span>
     </div>
-    <div class="field-inline">
-      <input type="number" id="extraCoupon" value="0" min="0" placeholder="예: 3000 또는 30">
-      <select id="extraCouponType">
-        <option value="amount">원</option>
-        <option value="percent">%</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- 환불 사유 -->
-  <div class="field">
-    <div class="field-label">
-      <span class="main">③ 환불 사유</span>
-      <span class="hint"></span>
-    </div>
-    <select id="reason">
-      <option value="buyer">구매자 사유 (단순 변심 등)</option>
-      <option value="seller">판매자 사유 (불량, 오배송 등)</option>
-    </select>
-  </div>
-
-  <!-- 반품비 결제 옵션 -->
-  <div class="field">
-    <div class="field-label">
-      <span class="main">④ 반품비 결제 옵션</span>
-      <span class="hint"></span>
-    </div>
-    <select id="returnShippingPayment">
-      <option value="deduct">환불금에서 차감</option>
-      <option value="prepaid">선결제(직접 부담)</option>
-    </select>
+    <div class="calendar-days" id="calendarDays"></div>
   </div>
 </div>
 
+<script>
+  /* ======================
+     Helpers
+     ====================== */
+  function pad2(n){ return String(n).padStart(2, "0"); }
+  function dateKeyLocal(d){
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  }
 
-      <fieldset>
-  <legend>조건부 쿠폰 선택</legend>
-  <div class="coupon-list">
-    <!-- 기존 쿠폰들 -->
-    <label class="coupon-item">
-      <input type="checkbox" name="coupon" value="1000-10000">
-      <span class="coupon-label-main">10,000원 이상 결제 시 <strong>1,000원 할인</strong></span>
-      <span class="coupon-pill">10k / -1k</span>
-    </label>
-    <label class="coupon-item">
-      <input type="checkbox" name="coupon" value="3000-30000">
-      <span class="coupon-label-main">30,000원 이상 결제 시 <strong>3,000원 할인</strong></span>
-      <span class="coupon-pill">30k / -3k</span>
-    </label>
-    <label class="coupon-item">
-      <input type="checkbox" name="coupon" value="5000-50000">
-      <span class="coupon-label-main">50,000원 이상 결제 시 <strong>5,000원 할인</strong></span>
-      <span class="coupon-pill">50k / -5k</span>
-    </label>
+  function normalizeToKey(value){
+    if(!value) return null;
+    let s = String(value).trim();
+    s = s.replace(/\([^)]+\)/g, "");
+    s = s.replace(/\s+/g, "");
 
-    <!-- 사용자 입력 조건부 쿠폰 (추가) -->
-<div style="margin-top:10px; padding-top:10px; border-top:1px dashed rgba(248,187,208,0.9);">
-  <div style="font-size:11px; color:var(--text-muted); margin-bottom:6px; letter-spacing:0.08em; text-transform:uppercase;">
-    사용자 입력 쿠폰
-  </div>
-
-  <!-- 1개 (원하면 더 복붙해서 늘리면 됨) -->
-  <label class="coupon-item">
-    <input type="checkbox" name="couponCustom" />
-    <span class="coupon-label-main" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-      <input type="number" class="customCondition" min="0" placeholder="예: 70000" style="max-width:120px;">
-      <span style="font-size:12px;">원 이상 결제 시</span>
-      <input type="number" class="customDiscount" min="0" placeholder="예: 8000" style="max-width:110px;">
-      <span style="font-size:12px;">원 할인</span>
-    </span>
-    <span class="coupon-pill">custom</span>
-  </label>
-</div>
-
-</fieldset>
-
-      </section>
-
-      <!-- 오른쪽 카드: 상품 리스트 & 결과 -->
-      <section class="card">
-        <div class="card-header">
-          <div class="card-title">
-            Item Lines
-            <span class="card-dot"></span>
-          </div>
-          <div class="card-sub">환불 여부 선택</div>
-        </div>
-
-        <div class="table-wrapper">
-          <table id="productTable">
-            <thead>
-              <tr>
-                <th>상품명</th>
-                <th>상품가</th>
-                <th>개별할인</th>
-                <th>환불 여부</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><input type="text" value="" placeholder="예: 상의"></td>
-                <td><input type="number" value="" min="0" placeholder="0"></td>
-                <td><input type="number" value="" min="0" placeholder="0"></td>
-                <td><input type="checkbox"></td>
-              </tr>
-              <tr>
-                <td><input type="text" value="" placeholder="예: 하의"></td>
-                <td><input type="number" value="" min="0" placeholder="0"></td>
-                <td><input type="number" value="" min="0" placeholder="0"></td>
-                <td><input type="checkbox"></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="table-hint">
-        
-        </div>
-
-        <div class="actions">
-          <button type="button" class="btn-ghost" onclick="addRow()">
-            <span class="icon">＋</span> 상품 추가
-          </button>
-          <button type="button" class="btn-primary" onclick="calculateRefund()">
-            <span class="icon">⚡</span> 환불액 계산
-          </button>
-          <button type="button" class="btn-danger" onclick="resetForm()">
-            <span class="icon">⟲</span> 초기화
-          </button>
-        </div>
-
-        <div id="resultContainer" class="result-container empty">
-          <div class="result-top">
-            <span class="result-label">Refund Breakdown</span>
-          </div>
-          <div class="result-text">
-            <p class="result-empty">
-              환불할 상품을 체크하고 금액을 입력한 뒤 <strong>“환불액 계산”</strong> 버튼을 눌러주세요.
-            </p>
-          </div>
-        </div>
-
-        <div id="result" style="display:none;"></div>
-      </section>
-    </div>
-  </div>
-
-  <script>
-    function addRow() {
-      const table = document.getElementById("productTable").getElementsByTagName("tbody")[0];
-      const row = table.insertRow();
-      row.innerHTML = `
-        <td><input type="text" value="" placeholder="상품명"></td>
-        <td><input type="number" value="" min="0" placeholder="0"></td>
-        <td><input type="number" value="" min="0" placeholder="0"></td>
-        <td><input type="checkbox"></td>
-      `;
+    const ymd = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/);
+    if(ymd){
+      return `${ymd[1]}-${String(ymd[2]).padStart(2,"0")}-${String(ymd[3]).padStart(2,"0")}`;
     }
 
-  function calculateRefund() {
-  const points = parseInt(document.getElementById('points').value) || 0;
+    const md = s.match(/^(\d{1,2})[\/\-.](\d{1,2})$/);
+    if(md){
+      const year = new Date().getFullYear();
+      return `${year}-${pad2(Number(md[1]))}-${pad2(Number(md[2]))}`;
+    }
 
-  // 장바구니 일반쿠폰: 금액/퍼센트 처리
-  const extraCouponRaw = parseInt(document.getElementById('extraCoupon').value) || 0;
-  const extraCouponType = document.getElementById('extraCouponType').value;
-
-  const reason = document.getElementById('reason').value;
-  const returnShippingPayment = document.getElementById('returnShippingPayment').value;
-
-  const rows = document.getElementById("productTable").getElementsByTagName("tbody")[0].rows;
-
-  // 1. 상품 전체 합계 (개별할인 반영 후)
-  let totalBeforeCoupon = 0;
-  for (let row of rows) {
-    const price = parseInt(row.cells[1].querySelector("input").value) || 0;
-    const discount = parseInt(row.cells[2].querySelector("input").value) || 0;
-    totalBeforeCoupon += Math.max(price - discount, 0);
+    const d = new Date(s);
+    if(!isNaN(d)) return dateKeyLocal(d);
+    return null;
   }
 
-  // 2. 장바구니 일반쿠폰 금액 계산 (원 / %)
-  let extraCoupon = 0;
-  if (extraCouponType === 'amount') {
-    extraCoupon = extraCouponRaw;
-  } else if (extraCouponType === 'percent') {
-    const percent = Math.max(0, Math.min(extraCouponRaw, 100));
-    extraCoupon = Math.floor(totalBeforeCoupon * (percent / 100));
+  function inRangeKey(dayKey, startKey, endKey){
+    return dayKey >= startKey && dayKey <= endKey;
   }
-  extraCoupon = Math.min(extraCoupon, totalBeforeCoupon);
 
- // 3. 선택된 조건부 쿠폰 (기존 + 사용자 입력)
-let selectedCoupons = [];
-
-// (1) 기존 쿠폰
-selectedCoupons.push(
-  ...Array.from(document.querySelectorAll('input[name="coupon"]:checked'))
-    .map(c => c.value.split("-").map(Number)) // [discount, condition]
-);
-
-// (2) 사용자 입력 쿠폰
-Array.from(document.querySelectorAll('input[name="couponCustom"]')).forEach(chk => {
-  if (!chk.checked) return;
-
-  const row = chk.closest('label');
-  const condition = parseInt(row.querySelector('.customCondition')?.value) || 0;
-  const discount  = parseInt(row.querySelector('.customDiscount')?.value) || 0;
-
-  // 둘 중 하나라도 0이면 의미 없으니 제외(원하면 허용으로 바꿔도 됨)
-  if (condition > 0 && discount > 0) {
-    selectedCoupons.push([discount, condition]);
+  const KOR_DOW = ["일","월","화","수","목","금","토"];
+  function formatMDKorean(dateKey){
+    const [y,m,d] = dateKey.split("-").map(Number);
+    const dt = new Date(y, m-1, d);
+    return `${pad2(m)}/${pad2(d)}(${KOR_DOW[dt.getDay()]})`;
   }
-});
 
-  let totalConditionalCoupon = 0;
-  selectedCoupons.forEach(([discount, condition]) => {
-    if (totalBeforeCoupon >= condition) totalConditionalCoupon += discount;
+  function formatBulletLines(text){
+    const s = String(text ?? "");
+    return s
+      .replace(/\s*■\s*/g, "\n■ ")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  function escapeHtml(str){
+    return String(str ?? "")
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#039;");
+  }
+
+  function textToHtmlWithBreaks(text){
+    const safe = escapeHtml(String(text ?? ""));
+    return safe.replace(/\r\n|\r|\n/g, "<br>");
+  }
+
+  function cleanTarget(raw){
+    let t = String(raw ?? "").trim();
+    t = t.replace(/^"+|"+$/g, "").trim();
+    if(t === '""') t = "";
+    return t;
+  }
+
+  /* ======================
+     DOM
+     ====================== */
+  const phoneWidget = document.getElementById("phoneWidget");
+  const phoneFormatBtn = document.getElementById("phoneFormatBtn");
+  const phoneClose = document.getElementById("phoneClose");
+  const phoneInput = document.getElementById("phoneInput");
+  const phoneOutput = document.getElementById("phoneOutput");
+  const phoneCopy = document.getElementById("phoneCopy");
+  const phoneHint = document.getElementById("phoneHint");
+
+  const accountWidget = document.getElementById("accountWidget");
+  const accountWidgetBtn = document.getElementById("accountWidgetBtn");
+  const accountClose = document.getElementById("accountClose");
+  const accountQuery = document.getElementById("accountQuery");
+  const accountSearchBtn = document.getElementById("accountSearchBtn");
+  const accountMatchAll = document.getElementById("accountMatchAll");
+  const accountResult = document.getElementById("accountResult");
+  const accountCount = document.getElementById("accountCount");
+  const accountToast = document.getElementById("accountToast");
+
+  const mainFrame = document.getElementById("mainFrame");
+  const navItems = document.querySelectorAll(".nav-item");
+
+  const subSidebar = document.getElementById("subSidebar");
+  const googleBtn = document.getElementById("googleBtn");
+  const googleChildren = document.querySelectorAll(".google-child");
+
+  const calendarWidget = document.getElementById("calendarWidget");
+  const adminEventBtn = document.getElementById("adminEventBtn");
+  const calViewSeg = document.getElementById("calViewSeg");
+
+  const todayIcon = document.getElementById("todayEventIcon");
+  const todayBadge = document.getElementById("todayBadge");
+
+  const popup = document.getElementById("datePopup");
+  const popupList = document.getElementById("popupEventList");
+  const popupLabel = document.getElementById("popupDateLabel");
+  const popupClose = document.getElementById("popupClose");
+
+  const EVENT_SHEET_URL =
+    "https://docs.google.com/spreadsheets/d/1Cjoo-x9lBA5pFtGoxftdAxdoKrzt770XcPGeXOidPiI/edit?pli=1&gid=1830278768#gid=1830278768";
+
+  /* ======================
+     iframe refresh restore
+     ====================== */
+  const LAST_FRAME_KEY = "lastFrameURL";
+  function restoreLastFrame(){
+    const last = localStorage.getItem(LAST_FRAME_KEY);
+    mainFrame.src = last ? last : "https://wskimkj.github.io/search/";
+  }
+  function rememberFrame(url){ localStorage.setItem(LAST_FRAME_KEY, url); }
+  restoreLastFrame();
+
+  mainFrame.addEventListener("load", () => {
+    rememberFrame(mainFrame.src);
+    try{
+      const real = mainFrame.contentWindow.location.href;
+      if(real) rememberFrame(real);
+    }catch{}
   });
 
-  // 4. 상품별 환불 계산 (extra 쿠폰/적립금 비율 배분)
-  let refundTotal = 0;
-  let keptTotal = 0;
-  let refundDetails = "<strong>상품별 환불 내역:</strong><br>";
-  let hasRefund = false;
-  let allRefunded = true;
+  /* ======================
+     UI helpers (close)
+     ====================== */
+  function hideSubSidebar(){ subSidebar.classList.remove("visible"); }
+  function hideCalendar(){ calendarWidget.classList.remove("visible"); }
+  function closePopup(){ popup.classList.remove("open"); }
+  function hidePhone(){ phoneWidget.classList.remove("visible"); }
+  function hideAccount(){ accountWidget.classList.remove("visible"); }
 
-  for (let row of rows) {
-    const name = row.cells[0].querySelector("input").value || "상품";
-    const price = parseInt(row.cells[1].querySelector("input").value) || 0;
-    const discount = parseInt(row.cells[2].querySelector("input").value) || 0;
-    const realPrice = Math.max(price - discount, 0);
-    const checked = row.cells[3].querySelector("input").checked;
+  /* ======================
+     Phone widget
+     ====================== */
+  function formatKoreanPhone(input){
+    let num = String(input ?? "").replace(/\D/g, "");
+    if(num.startsWith("82")) num = "0" + num.slice(2);
 
-    const ratio = totalBeforeCoupon > 0 ? realPrice / totalBeforeCoupon : 0;
-    const extraCouponAllocated = Math.floor(extraCoupon * ratio);
-    const pointsAllocated = Math.floor(points * ratio);
+    const SAFE_PREFIX = ["0502","0504","0505","0506","0507"];
+    for(const p of SAFE_PREFIX){
+      if(num.startsWith(p)){
+        if(num.length === 11){
+          return { type:"safe", value: num.replace(/(\d{4})(\d{3})(\d{4})/, "$1-$2-$3") };
+        }
+        if(num.length === 12){
+          return { type:"safe", value: num.replace(/(\d{4})(\d{4})(\d{4})/, "$1-$2-$3") };
+        }
+      }
+    }
 
-    if (checked) {
-      const refundForItem = Math.max(realPrice - extraCouponAllocated - pointsAllocated, 0);
-      refundTotal += refundForItem;
-      refundDetails += `${name} (상품가 ${realPrice.toLocaleString()} - 일반쿠폰 ${extraCouponAllocated.toLocaleString()} - 적립금 ${pointsAllocated.toLocaleString()}) → 환불 ${refundForItem.toLocaleString()}원<br>`;
-      hasRefund = true;
-    } else {
-      keptTotal += realPrice;
-      allRefunded = false;
+    if(num.length === 10 && num.startsWith("10")) num = "0" + num;
+    if(num.length === 11 && num.startsWith("010")){
+      return { type:"mobile", value: num.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3") };
+    }
+    return { type:"unknown", value:"" };
+  }
+
+  function togglePhone(){
+    const v = phoneWidget.classList.contains("visible");
+    if(v){
+      hidePhone();
+    }else{
+      phoneWidget.classList.add("visible");
+      hideCalendar();
+      hideSubSidebar();
+      hideAccount();
+      closePopup();
+      phoneInput.focus();
     }
   }
 
-  const resultContainer = document.getElementById('resultContainer');
-  const hiddenResultDiv = document.getElementById('result');
+  phoneFormatBtn.addEventListener("click",(e)=>{
+    togglePhone();
+    e.stopPropagation();
+  });
+  phoneClose.addEventListener("click",(e)=>{
+    hidePhone();
+    e.stopPropagation();
+  });
+  phoneWidget.addEventListener("click",(e)=> e.stopPropagation());
+  phoneWidget.addEventListener("mouseleave", () => hidePhone());
 
-  if (!hasRefund) {
-    resultContainer.classList.add('empty');
-    resultContainer.innerHTML = `
-      <div class="result-top">
-        <span class="result-label">Refund Breakdown</span>
-      </div>
-      <div class="result-text">
-        <p class="result-empty">환불 상품이 선택되지 않았습니다. 최소 1개 이상 체크해 주세요.</p>
-      </div>
-    `;
-    return;
-  }
-
-  refundDetails += `<br>환불 요청 상품 합계: ${refundTotal.toLocaleString()}원<br>`;
-
-  // 5. 조건부 쿠폰 유지/무효화 판정
-  let validConditionalCoupon = 0;
-  let couponMessages = "<br><strong>조건부 쿠폰 내역:</strong><br>";
-  selectedCoupons.forEach(([discount, condition]) => {
-    if (keptTotal >= condition) {
-      validConditionalCoupon += discount;
-      couponMessages += `쿠폰 ${discount.toLocaleString()}원 유지<br>`;
-    } else {
-      couponMessages += `<span style="color:#b91c1c">쿠폰 ${discount.toLocaleString()}원 무효화</span><br>`;
+  phoneInput.addEventListener("input", ()=>{
+    const result = formatKoreanPhone(phoneInput.value);
+    if(result.value){
+      phoneOutput.textContent = result.value;
+      phoneHint.textContent = (result.type === "safe") ? "안전번호 (가상번호)" : "휴대폰 번호";
+    }else{
+      phoneOutput.textContent = "010-0000-0000";
+      phoneHint.textContent = "번호를 입력하세요";
     }
   });
 
-  // 6. 최종 환불액 = 상품별 환불 합계 - (무효화된 조건부 쿠폰 금액)
-  let finalRefund = refundTotal;
-  const lostConditionalCoupon = totalConditionalCoupon - validConditionalCoupon;
-  if (lostConditionalCoupon > 0) {
-    couponMessages += `<span style="color:#b91c1c">총 ${lostConditionalCoupon.toLocaleString()}원 쿠폰 회수로 환불액에서 차감</span><br>`;
-    finalRefund -= lostConditionalCoupon;
+  async function copyText(v){
+    if(!v || v === "010-0000-0000") return;
+    try{
+      await navigator.clipboard.writeText(v);
+      phoneHint.textContent = "복사됨 ✅";
+    }catch{
+      phoneHint.textContent = "복사 실패(브라우저 권한 확인)";
+    }
+  }
+  phoneOutput.addEventListener("click",(e)=>{
+    e.preventDefault(); e.stopPropagation();
+    copyText(phoneOutput.textContent);
+  });
+  phoneCopy.addEventListener("click",(e)=>{
+    e.preventDefault(); e.stopPropagation();
+    copyText(phoneOutput.textContent);
+  });
+
+  /* ======================
+     Account widget (from your old account page -> widget)
+     ====================== */
+  const ACCOUNT_SHEET_ID = "1bdGBLki_3CVaq7BDL3u-pQDSZVBD7roeEdsyP-74Lz0";
+  const SHOP_GIDS = [0, 618725932, 1481873109];
+  const OTHER_GID = 267581891;
+
+  let SHOP_SITES = [];
+  let OTHER_SITES = [];
+  let accountLoaded = false;
+
+  function accountCsvUrl(gid){
+    return `https://docs.google.com/spreadsheets/d/${ACCOUNT_SHEET_ID}/export?format=csv&gid=${gid}`;
   }
 
-  // 7. 배송비 로직
-  const FREE_LIMIT = 30000;
-  const SHIPPING = 3000;
-  let shippingDeduction = 0;
-  let shippingDetails = "<br><strong>배송비 내역:</strong><br>";
+  function parseCsv(text){
+    const rows = [];
+    let row = [];
+    let cur = "";
+    let inQuotes = false;
 
-  if (reason === "buyer" && hasRefund) {
-    if (returnShippingPayment === "deduct") {
-      shippingDeduction += SHIPPING;
-      shippingDetails += `반품배송비 차감: -${SHIPPING.toLocaleString()}원<br>`;
-    } else {
-      shippingDetails += `반품배송비 선결제(직접 부담): 환불액에서 추가 차감 없음<br>`;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      const next = text[i + 1];
+
+      if (ch === '"') {
+        if (inQuotes && next === '"') { cur += '"'; i++; }
+        else inQuotes = !inQuotes;
+        continue;
+      }
+
+      if (!inQuotes && ch === ",") { row.push(cur); cur = ""; continue; }
+
+      if (!inQuotes && (ch === "\n" || ch === "\r")) {
+        if (ch === "\r" && next === "\n") i++;
+        row.push(cur);
+        if (row.some(c => (c || "").toString().trim() !== "")) rows.push(row);
+        row = [];
+        cur = "";
+        continue;
+      }
+
+      cur += ch;
     }
 
-    if (allRefunded && totalBeforeCoupon >= FREE_LIMIT) {
-      shippingDeduction += SHIPPING;
-      shippingDetails += `초도배송비 차감: -${SHIPPING.toLocaleString()}원<br>`;
-    } else if (keptTotal < FREE_LIMIT) {
-      shippingDeduction += SHIPPING;
-      shippingDetails += `남은 금액 ${keptTotal.toLocaleString()}원 < ${FREE_LIMIT.toLocaleString()}원 → 초도배송비 차감: -${SHIPPING.toLocaleString()}원<br>`;
+    if (cur.length > 0 || row.length > 0) {
+      row.push(cur);
+      if (row.some(c => (c || "").toString().trim() !== "")) rows.push(row);
     }
-  } else {
-    shippingDetails += "판매자 사유: 배송비 차감 없음<br>";
+
+    return rows;
   }
 
-  finalRefund -= shippingDeduction;
-  const safeFinalRefund = Math.max(finalRefund, 0);
+  async function fetchCsv(gid){
+    const res = await fetch(accountCsvUrl(gid), { cache:"no-store" });
+    if(!res.ok) throw new Error("csv fetch failed");
+    const text = await res.text();
+    return parseCsv(text);
+  }
 
-  const combinedHtml =
-    refundDetails +
-    couponMessages +
-    shippingDetails +
-    `<br><strong>최종 환불액: <span style="color:#166534">${safeFinalRefund.toLocaleString()}원</span></strong>`;
+  function splitAgKeywords(v){
+    return (v || "").toString().split(",").map(s=>s.trim()).filter(Boolean);
+  }
+  function splitQueryKeywords(q){
+    return (q || "").toString().split(/[,\s]+/g).map(s=>s.trim()).filter(Boolean);
+  }
+  function normalize(s){ return (s || "").toString().toLowerCase().trim(); }
 
-  hiddenResultDiv.innerHTML = combinedHtml;
+  function tokenMatchAny(agTokens, queryTokens){
+    const a = (agTokens || []).map(normalize).filter(Boolean);
+    const q = (queryTokens || []).map(normalize).filter(Boolean);
+    if(!a.length || !q.length) return false;
+    return q.some(qt => a.some(at => at.includes(qt)));
+  }
+  function tokenMatchAll(agTokens, queryTokens){
+    const a = (agTokens || []).map(normalize).filter(Boolean);
+    const q = (queryTokens || []).map(normalize).filter(Boolean);
+    if(!a.length || !q.length) return false;
+    return q.every(qt => a.some(at => at.includes(qt)));
+  }
 
-  resultContainer.classList.remove('empty');
-  resultContainer.innerHTML = `
-    <div class="result-top">
-      <span class="result-label">Refund Breakdown</span>
-      <span class="badge-reason">${reason === "buyer" ? "구매자 사유" : "판매자 사유"}</span>
-    </div>
-    <div class="result-amount">
-      ${safeFinalRefund.toLocaleString()}<span class="currency">원 환불 예정</span>
-    </div>
-    <div class="result-text">
-      ${combinedHtml}
-    </div>
-  `;
-}
+  async function loadAccountData(){
+    accountResult.innerHTML = '<div class="account-empty">데이터 불러오는 중...</div>';
+    accountCount.textContent = "";
 
-  </script>
+    try{
+      const shopPromises = SHOP_GIDS.map(gid => fetchCsv(gid));
+      const shopSheetsRows = await Promise.all(shopPromises);
+
+      SHOP_SITES = [];
+
+      shopSheetsRows.forEach((rows, idx)=>{
+        const gid = SHOP_GIDS[idx];
+        if(!rows || rows.length <= 1) return;
+
+        let groupLabel = (gid === 0) ? "JH" : (gid === 618725932) ? "NH" : (gid === 1481873109) ? "HTY" : "기타";
+
+        rows.slice(1).forEach(cols=>{
+          const colA = (cols[0] || "").toString().trim();
+          if(colA === "매장") return;
+
+          const ag = cols[32] || "";
+          const agKeywords = splitAgKeywords(ag);
+          if(!agKeywords.length) return;
+
+          let storeId = "", loginId = "", pw = "";
+          if(gid === 0 || gid === 618725932){
+            storeId = cols[13];
+            loginId = cols[14];
+            pw      = cols[15];
+          }else if(gid === 1481873109){
+            storeId = cols[12];
+            loginId = cols[13];
+            pw      = cols[14];
+          }
+
+          SHOP_SITES.push({
+            group: groupLabel,
+            siteName: ag || "",
+            agKeywords,
+            storeId: storeId || "",
+            loginId: loginId || "",
+            pw: pw || ""
+          });
+        });
+      });
+
+      OTHER_SITES = [];
+      if(OTHER_GID != null){
+        const otherRows = await fetchCsv(OTHER_GID);
+        if(otherRows && otherRows.length > 1){
+          otherRows.slice(1).forEach(cols=>{
+            const colA = (cols[0] || "").toString().trim();
+            if(colA === "매장") return;
+
+            const siteName = cols[0];
+            const loginId  = cols[3];
+            const pw       = cols[4];
+            if(!siteName) return;
+
+            OTHER_SITES.push({
+              group: "기타",
+              siteName: siteName || "",
+              agKeywords: splitAgKeywords(siteName),
+              storeId: "",
+              loginId: loginId || "",
+              pw: pw || ""
+            });
+          });
+        }
+      }
+
+      accountLoaded = true;
+      accountResult.innerHTML = '<div class="account-empty">검색어를 입력하세요.</div>';
+      accountCount.textContent = "0건";
+    }catch(err){
+      console.error(err);
+      accountLoaded = false;
+      accountResult.innerHTML =
+        '<div class="account-empty">데이터를 불러오지 못했습니다. (시트 공개 권한 확인 필요)</div>';
+      accountCount.textContent = "";
+    }
+  }
+
+  function searchAccountSites(query, matchAll){
+    const queryTokens = splitQueryKeywords(query);
+    if(!queryTokens.length) return [];
+    const matcher = matchAll ? tokenMatchAll : tokenMatchAny;
+
+    const results = [];
+    SHOP_SITES.forEach(item=>{
+      if(matcher(item.agKeywords, queryTokens)){
+        results.push({
+          group: item.group || "기타",
+          siteName: item.siteName || "",
+          storeId: item.storeId || "",
+          loginId: item.loginId || "",
+          pw: item.pw || ""
+        });
+      }
+    });
+
+    OTHER_SITES.forEach(item=>{
+      if(matcher(item.agKeywords, queryTokens)){
+        results.push({
+          group: item.group || "기타",
+          siteName: item.siteName || "",
+          storeId: "",
+          loginId: item.loginId || "",
+          pw: item.pw || ""
+        });
+      }
+    });
+
+    results.sort((a,b)=>(a.siteName||"").localeCompare(b.siteName||""));
+    return results;
+  }
+
+  let accountToastTimer = null;
+  function showAccountToast(){
+    accountToast.classList.add("show");
+    if(accountToastTimer) clearTimeout(accountToastTimer);
+    accountToastTimer = setTimeout(()=> accountToast.classList.remove("show"), 1100);
+  }
+
+  function copyToClipboard(text){
+    if(!text) return;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(showAccountToast).catch(()=>{});
+    }else{
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try{ document.execCommand("copy"); showAccountToast(); }catch{}
+      document.body.removeChild(ta);
+    }
+  }
+
+  function makeAccountChip(label, value){
+    const chip = document.createElement("div");
+    chip.className = "account-chip";
+
+    const k = document.createElement("div");
+    k.className = "k";
+    k.textContent = label;
+
+    const v = document.createElement("div");
+    v.className = "v";
+    v.textContent = value;
+
+    const btn = document.createElement("button");
+    btn.className = "copy";
+    btn.type = "button";
+    btn.textContent = "복사";
+    btn.addEventListener("click",(e)=>{
+      e.stopPropagation();
+      copyToClipboard(value);
+    });
+
+    chip.appendChild(k);
+    chip.appendChild(v);
+    chip.appendChild(btn);
+    return chip;
+  }
+
+  function renderAccountResults(list){
+    if(!list || list.length === 0){
+      accountResult.innerHTML = '<div class="account-empty">검색 결과가 없습니다.</div>';
+      accountCount.textContent = "0건";
+      return;
+    }
+
+    accountCount.textContent = list.length + "건";
+    accountResult.innerHTML = "";
+    const frag = document.createDocumentFragment();
+
+    list.forEach(item=>{
+      const card = document.createElement("div");
+      card.className = "account-card";
+
+      const head = document.createElement("div");
+      head.className = "account-card-head";
+
+      const site = document.createElement("div");
+      site.className = "account-site";
+      site.textContent = item.siteName || "(사이트명 없음)";
+
+      const grp = document.createElement("div");
+      grp.className = "account-group";
+      grp.textContent = (item.group || "기타").toUpperCase();
+
+      head.appendChild(site);
+      head.appendChild(grp);
+
+      const fields = document.createElement("div");
+      fields.className = "account-fields";
+
+      const store = (item.storeId || "").toString().trim();
+      const hasStore = store !== "" && store !== "-" && store !== "없음";
+      if(hasStore) fields.appendChild(makeAccountChip("상점", item.storeId));
+      if(item.loginId) fields.appendChild(makeAccountChip("ID", item.loginId));
+      if(item.pw) fields.appendChild(makeAccountChip("PW", item.pw));
+
+      card.appendChild(head);
+      card.appendChild(fields);
+      frag.appendChild(card);
+    });
+
+    accountResult.appendChild(frag);
+  }
+
+  function doAccountSearch(){
+    if(!accountLoaded){
+      accountResult.innerHTML = '<div class="account-empty">아직 데이터 로딩 중입니다.</div>';
+      accountCount.textContent = "";
+      return;
+    }
+    const q = accountQuery.value.trim();
+    if(!q){
+      accountResult.innerHTML = '<div class="account-empty">검색어를 입력하세요.</div>';
+      accountCount.textContent = "0건";
+      return;
+    }
+    const results = searchAccountSites(q, !!accountMatchAll.checked);
+    renderAccountResults(results);
+  }
+
+  function toggleAccount(){
+    const v = accountWidget.classList.contains("visible");
+    if(v){
+      hideAccount();
+    }else{
+      accountWidget.classList.add("visible");
+      hideCalendar();
+      hideSubSidebar();
+      hidePhone();
+      closePopup();
+
+      if(!accountLoaded){
+        loadAccountData();
+      }
+      accountQuery.focus();
+    }
+  }
+
+  accountWidgetBtn.addEventListener("click",(e)=>{
+    toggleAccount();
+    e.stopPropagation();
+  });
+  accountClose.addEventListener("click",(e)=>{
+    hideAccount();
+    e.stopPropagation();
+  });
+  accountWidget.addEventListener("click",(e)=> e.stopPropagation());
+  accountWidget.addEventListener("mouseleave", ()=> hideAccount());
+
+  accountSearchBtn.addEventListener("click", doAccountSearch);
+  accountQuery.addEventListener("keydown",(e)=>{
+    if(e.key === "Enter") doAccountSearch();
+  });
+  accountMatchAll.addEventListener("change", ()=>{
+    if(accountQuery.value.trim()) doAccountSearch();
+  });
+
+  /* ======================
+     Nav + sub sidebar + calendar
+     ====================== */
+  function toggleSubSidebar(){
+    const v = subSidebar.classList.contains("visible");
+    if(v) subSidebar.classList.remove("visible");
+    else{ subSidebar.classList.add("visible"); hideCalendar(); hidePhone(); hideAccount(); closePopup(); }
+  }
+  function toggleCalendar(){
+    const v = calendarWidget.classList.contains("visible");
+    if(v) { calendarWidget.classList.remove("visible"); closePopup(); }
+    else{
+      calendarWidget.classList.add("visible");
+      hideSubSidebar();
+      hidePhone();
+      hideAccount();
+      buildCalendar();
+    }
+  }
+
+  adminEventBtn.addEventListener("click",(e)=>{
+    toggleCalendar();
+    e.stopPropagation();
+  });
+
+  navItems.forEach(btn=>{
+    btn.addEventListener("click",(e)=>{
+      const id = btn.dataset.id;
+      const href = btn.dataset.href;
+
+      if(id === "google"){ toggleSubSidebar(); e.stopPropagation(); return; }
+
+      navItems.forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+
+      hideSubSidebar();
+      hideCalendar();
+      hidePhone();
+      hideAccount();
+      closePopup();
+
+      if(href){
+        mainFrame.src = href;
+        rememberFrame(href);
+      }
+      e.stopPropagation();
+    });
+  });
+
+  googleChildren.forEach(btn=>{
+    btn.addEventListener("click",(e)=>{
+      googleChildren.forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      const url = btn.dataset.href;
+      mainFrame.src = url;
+      rememberFrame(url);
+      e.stopPropagation();
+    });
+  });
+
+  document.addEventListener("keydown",(e)=>{
+    if(e.key === "Escape"){
+      closePopup();
+      hideCalendar();
+      hidePhone();
+      hideAccount();
+      hideSubSidebar();
+    }
+  });
+
+  popupClose.addEventListener("click",(e)=>{
+    closePopup();
+    e.stopPropagation();
+  });
+
+  todayIcon.addEventListener("click",(e)=>{
+    window.open(EVENT_SHEET_URL, "_blank");
+    e.stopPropagation();
+  });
+
+  document.addEventListener("click", (e)=>{
+    const btn = e.target.closest("[data-itemtoggle]");
+    if(!btn) return;
+
+    e.stopPropagation();
+
+    const box = btn.closest("[data-itembox]");
+    const content = box?.querySelector("[data-itemcontent]");
+    if(!content) return;
+
+    const expanded = btn.getAttribute("aria-expanded") === "true";
+    btn.setAttribute("aria-expanded", String(!expanded));
+    content.classList.toggle("is-collapsed", expanded ? true : false);
+  });
+
+  /* ======================
+     calendar view mode
+     ====================== */
+  const CAL_VIEW_KEY = "calendarViewMode";
+  let calendarViewMode = localStorage.getItem(CAL_VIEW_KEY) || "week";
+
+  function applyViewSeg(){
+    [...calViewSeg.querySelectorAll("button")].forEach(b=>{
+      b.classList.toggle("active", b.dataset.view === calendarViewMode);
+    });
+  }
+  applyViewSeg();
+
+  calViewSeg.addEventListener("click",(e)=>{
+    const btn = e.target.closest("button");
+    if(!btn) return;
+    calendarViewMode = btn.dataset.view;
+    localStorage.setItem(CAL_VIEW_KEY, calendarViewMode);
+    applyViewSeg();
+    closePopup();
+    buildCalendar();
+    e.stopPropagation();
+  });
+
+  /* ======================
+     Load events from sheet (C~G)
+     ====================== */
+  let events = [];
+
+  const SHEET_ID = "1Cjoo-x9lBA5pFtGoxftdAxdoKrzt770XcPGeXOidPiI";
+  const SHEET_GID = "1830278768";
+  const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`;
+
+  function parseCSV(text){
+    const rows = [];
+    let row = [], cur = "", inQ = false;
+    if(text && text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+
+    for(let i=0;i<text.length;i++){
+      const ch = text[i];
+      const next = text[i+1];
+
+      if(ch === '"' && next === '"'){ cur += '"'; i++; continue; }
+      if(ch === '"'){ inQ = !inQ; continue; }
+
+      if(ch === ',' && !inQ){ row.push(cur); cur=""; continue; }
+
+      if((ch === '\n' || ch === '\r') && !inQ){
+        if(cur.length || row.length){ row.push(cur); rows.push(row); }
+        cur=""; row=[];
+        continue;
+      }
+      cur += ch;
+    }
+    if(cur.length || row.length){ row.push(cur); rows.push(row); }
+    return rows;
+  }
+
+  async function loadEventsFromSheet(){
+    try{
+      const res = await fetch(SHEET_CSV_URL, { cache:"no-store" });
+      if(!res.ok) throw new Error(`sheet fetch failed (${res.status})`);
+      const csv = await res.text();
+      const rows = parseCSV(csv);
+
+      const parsed = [];
+      for(const r of rows){
+        const mall    = (r[2] || "").trim(); // C
+        const startV  = (r[3] || "").trim(); // D
+        const endV    = (r[4] || "").trim(); // E
+        const content = (r[5] || "").trim(); // F
+        const target  = cleanTarget(r[6] || ""); // G
+
+        if(!mall && !startV && !endV && !content && !target) continue;
+
+        const startKey = normalizeToKey(startV);
+        const endKey   = normalizeToKey(endV);
+        if(!mall || !startKey || !endKey) continue;
+        if(startKey > endKey) continue;
+
+        parsed.push({ mall, start: startKey, end: endKey, content, target });
+      }
+
+      events = parsed;
+      buildCalendar();
+      updateTodayBadge();
+    }catch(err){
+      events = [];
+      buildCalendar();
+      updateTodayBadge();
+    }
+  }
+
+  function updateTodayBadge(){
+    const todayKey = dateKeyLocal(new Date());
+    const count = events.filter(ev => inRangeKey(todayKey, ev.start, ev.end)).length;
+
+    if(count > 0){
+      todayIcon.classList.remove("dim");
+      todayBadge.style.display = "inline-flex";
+      todayBadge.textContent = String(count);
+    }else{
+      todayIcon.classList.add("dim");
+      todayBadge.style.display = "none";
+      todayBadge.textContent = "";
+    }
+  }
+
+  function openPopupForDate(dateKey){
+    const items = events.filter(ev => inRangeKey(dateKey, ev.start, ev.end));
+    popupLabel.textContent = formatMDKorean(dateKey);
+
+    popupList.innerHTML = items.length
+      ? items.map(ev=>{
+          const pretty = formatBulletLines(ev.content || "(내용없음)");
+          const hasItem = !!(ev.target && ev.target.trim());
+
+          return `
+            <div class="mini-event">
+              <div class="mall">${escapeHtml(ev.mall)}</div>
+              <div class="event-text">${textToHtmlWithBreaks(pretty)}</div>
+
+              ${hasItem ? `
+                <div class="item-box" data-itembox>
+                  <button type="button" class="item-head" data-itemtoggle aria-expanded="false">
+                    <span class="item-label">ITEM</span>
+                    <i class='bx bx-chevron-down item-caret'></i>
+                  </button>
+                  <div class="item-text is-collapsed" data-itemcontent>
+                    ${escapeHtml(ev.target)}
+                  </div>
+                </div>
+              ` : ``}
+
+              <div class="meta">${escapeHtml(ev.start)} ~ ${escapeHtml(ev.end)}</div>
+            </div>
+          `;
+        }).join("")
+      : `<div style="font-size:11px;color:rgba(15,23,42,0.62);font-weight:800;padding:6px 2px;">이날 이벤트 없음</div>`;
+
+    popup.classList.add("open");
+  }
+
+  function buildCalendar(){
+    if(calendarViewMode === "month") buildCalendarMonth();
+    else buildCalendarWeek();
+  }
+
+  function buildCalendarWeek(){
+    const today = new Date();
+    const todayKey = dateKeyLocal(today);
+
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    document.getElementById("calendarMonthLabel").textContent = `${monthNames[today.getMonth()]} ${today.getFullYear()}`;
+
+    const dow = (today.getDay()+6)%7; // Mon=0
+    const mon = new Date(today);
+    mon.setDate(today.getDate() - dow);
+
+    const days = [];
+    for(let i=0;i<5;i++){
+      const d = new Date(mon);
+      d.setDate(mon.getDate()+i);
+      days.push(d);
+    }
+
+    const daysContainer = document.getElementById("calendarDays");
+    daysContainer.innerHTML = "";
+
+    days.forEach(d=>{
+      const key = dateKeyLocal(d);
+      const count = events.filter(ev => inRangeKey(key, ev.start, ev.end)).length;
+
+      const cell = document.createElement("div");
+      cell.className = "calendar-day";
+      cell.textContent = d.getDate();
+
+      if(key === todayKey) cell.classList.add("today");
+      if(count > 0){
+        cell.classList.add("has-event");
+        const badge = document.createElement("div");
+        badge.className = "day-badge";
+        badge.textContent = String(count);
+        cell.appendChild(badge);
+      }
+
+      cell.addEventListener("click", (e)=>{
+        openPopupForDate(key);
+        e.stopPropagation();
+      });
+
+      daysContainer.appendChild(cell);
+    });
+  }
+
+  function buildCalendarMonth(){
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const todayKey = dateKeyLocal(today);
+
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    document.getElementById("calendarMonthLabel").textContent = `${monthNames[month]} ${year}`;
+
+    const firstOfMonth = new Date(year, month, 1);
+    const lastOfMonth  = new Date(year, month + 1, 0);
+
+    const daysContainer = document.getElementById("calendarDays");
+    daysContainer.innerHTML = "";
+
+    let start = new Date(firstOfMonth);
+    const startDow = (start.getDay()+6)%7;
+    start.setDate(start.getDate()-startDow);
+
+    let end = new Date(lastOfMonth);
+    const endDow = (end.getDay()+6)%7;
+    end.setDate(end.getDate() + (4 - endDow)); // Fri
+
+    let d = new Date(start);
+    while(d <= end){
+      const wd = d.getDay();
+      if(wd >= 1 && wd <= 5){
+        const key = dateKeyLocal(d);
+        const count = events.filter(ev => inRangeKey(key, ev.start, ev.end)).length;
+
+        const cell = document.createElement("div");
+        cell.className = "calendar-day";
+        if(d.getMonth() !== month) cell.classList.add("other-month");
+        cell.textContent = d.getDate();
+
+        if(key === todayKey) cell.classList.add("today");
+        if(count > 0){
+          cell.classList.add("has-event");
+          const badge = document.createElement("div");
+          badge.className = "day-badge";
+          badge.textContent = String(count);
+          cell.appendChild(badge);
+        }
+
+        if(d.getMonth() === month){
+          cell.addEventListener("click", (e)=>{ openPopupForDate(key); e.stopPropagation(); });
+        }else{
+          cell.style.pointerEvents = "none";
+        }
+
+        daysContainer.appendChild(cell);
+      }
+      d.setDate(d.getDate()+1);
+    }
+  }
+
+  calendarWidget.addEventListener("click", (e)=> e.stopPropagation());
+  calendarWidget.addEventListener("mouseleave", () => {
+    closePopup();
+    hideCalendar();
+  });
+
+  document.addEventListener("click", (e)=>{
+    const t = e.target;
+
+    const clickedInsideCalendar = calendarWidget.contains(t);
+    const clickedAdminBtn = adminEventBtn.contains(t);
+
+    if(calendarWidget.classList.contains("visible") && !clickedInsideCalendar && !clickedAdminBtn){
+      closePopup();
+      hideCalendar();
+    }
+  });
+
+  /* ======================
+     init
+     ====================== */
+  loadEventsFromSheet();
+  buildCalendar();
+  updateTodayBadge();
+</script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
