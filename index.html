@@ -606,15 +606,6 @@ body {
       <span class="main">① 사용 적립금</span>
       <span class="hint">(원)</span>
     </div>
-
- <div class="field-inline">
-    <select id="pointsMode">
-      <option value="manual">직접 입력</option>
-      <option value="auto50">최종금액의 50% 자동</option>
-    </select>
-    <input type="number" id="points" value="0" min="0" placeholder="예: 5,000">
-  </div>
-    
     <input type="number" id="points" value="0" min="0" placeholder="예: 5,000">
   </div>
 
@@ -783,11 +774,7 @@ body {
     }
 
   function calculateRefund() {
-    // ✅ 적립금 입력/자동 옵션
-  const pointsMode = document.getElementById('pointsMode').value;
-  const pointsBalanceRaw = parseInt(document.getElementById('pointsBalance').value); // 선택
-  const hasBalance = Number.isFinite(pointsBalanceRaw);
-
+  const points = parseInt(document.getElementById('points').value) || 0;
 
   // 장바구니 일반쿠폰: 금액/퍼센트 처리
   const extraCouponRaw = parseInt(document.getElementById('extraCoupon').value) || 0;
@@ -843,27 +830,6 @@ Array.from(document.querySelectorAll('input[name="couponCustom"]')).forEach(chk 
   selectedCoupons.forEach(([discount, condition]) => {
     if (totalBeforeCoupon >= condition) totalConditionalCoupon += discount;
   });
-  // ✅ "할인이 모두 적용된 최종 금액(적립금 적용 전)" 기준으로 50% 한도 산출
-  // 최종금액(적립금 전) = 상품합계 - (추가할인) - (조건부쿠폰 적용분)
-  const finalAmountBeforePoints = Math.max(
-    totalBeforeCoupon - extraCoupon - totalConditionalCoupon,
-    0
-  );
-
-  const maxPointsByRule = Math.floor(finalAmountBeforePoints * 0.5);
-
-  let points = 0;
-  if (pointsMode === "auto50") {
-    points = hasBalance ? Math.min(pointsBalanceRaw, maxPointsByRule) : maxPointsByRule;
-
-    // UI에도 반영 (사용자가 결과 확인 가능)
-    document.getElementById('points').value = points;
-  } else {
-    // 직접입력 모드: 입력값 사용하되, 50% 룰을 초과하면 자동으로 한도까지 컷
-    const manualPoints = parseInt(document.getElementById('points').value) || 0;
-    points = Math.min(manualPoints, maxPointsByRule);
-    document.getElementById('points').value = points;
-  }
 
   // 4. 상품별 환불 계산 (extra 쿠폰/적립금 비율 배분)
   let refundTotal = 0;
@@ -986,8 +952,6 @@ Array.from(document.querySelectorAll('input[name="couponCustom"]')).forEach(chk 
   </script>
 </body>
 </html>
-
-
 
 
 
