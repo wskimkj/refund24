@@ -812,7 +812,18 @@
           shippingDetails += `초도배송비는 이미 결제된 주문(${initialShippingMode}) → 추가 차감 없음<br>`;
         }
       } else {
-        shippingDetails += "판매자 사유: 배송비 차감 없음<br>";
+        // ✅✅✅ 판매자 사유 로직 보강: 전액환불이면 고객이 낸 초도배송비도 환급(+)
+        shippingDetails += "판매자 사유: 반품배송비/초도배송비 차감 없음<br>";
+
+        // 무료배송으로 나간 주문은 애초에 고객이 낸 배송비가 없으니 환급 없음
+        // 고객결제/직접입력(=고객이 낸 배송비가 존재)이고, 전체 환불이면 배송비 환급
+        if (allRefunded && !initialShippingWasFree) {
+          const initialFee = Math.max(initialShippingAmount, 0);
+          if (initialFee > 0) {
+            finalRefund += initialFee;
+            shippingDetails += `초도배송비 환급(판매자 사유 전액환불): +${initialFee.toLocaleString()}원<br>`;
+          }
+        }
       }
 
       finalRefund -= shippingDeduction;
