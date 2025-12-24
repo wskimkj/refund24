@@ -347,15 +347,14 @@
 
     const rows = document.getElementById("productTable").getElementsByTagName("tbody")[0].rows;
 
-    // ✅ 빈행 제외(상품명 없고 금액 0이면 제외)
-    const effectiveRows = Array.from(rows).filter(row => {
-      const name = (row.cells[0].querySelector("input").value || "").trim();
-      const price = parseInt(row.cells[1].querySelector("input").value) || 0;
-      const discount = parseInt(row.cells[2].querySelector("input").value) || 0;
-      const qty = Math.max(parseInt(row.cells[3].querySelector("input").value) || 1, 1);
-      const line = Math.max(price - discount, 0) * qty;
-      return name !== "" || line > 0;
-    });
+    // ✅ 빈행 제외: "상품가"가 빈칸이면 그 행은 무시 (상품명은 빈칸이어도 OK)
+const effectiveRows = Array.from(rows).filter(row => {
+  const priceRaw = (row.cells[1].querySelector("input").value ?? "").trim();
+  // 가격 입력이 완전히 비어있으면 제외
+  if (priceRaw === "") return false;
+  return true;
+});
+
 
     const resultContainer = document.getElementById('resultContainer');
     const hiddenResultDiv = document.getElementById('result');
@@ -538,6 +537,7 @@
 </script>
 </body>
 </html>
+
 
 
 
