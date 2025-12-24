@@ -221,13 +221,7 @@
                 <td><input type="number" value="1" min="1" placeholder="1"></td>
                 <td><input type="checkbox"></td>
               </tr>
-              <tr>
-                <td><input type="text" value="" placeholder="예: 하의"></td>
-                <td><input type="number" value="" min="0" placeholder="0"></td>
-                <td><input type="number" value="" min="0" placeholder="0"></td>
-                <td><input type="number" value="1" min="1" placeholder="1"></td>
-                <td><input type="checkbox"></td>
-              </tr>
+          
             </tbody>
           </table>
         </div>
@@ -331,13 +325,7 @@
           <td><input type="number" value="1" min="1" placeholder="1"></td>
           <td><input type="checkbox"></td>
         </tr>
-        <tr>
-          <td><input type="text" value="" placeholder="예: 하의"></td>
-          <td><input type="number" value="" min="0" placeholder="0"></td>
-          <td><input type="number" value="" min="0" placeholder="0"></td>
-          <td><input type="number" value="1" min="1" placeholder="1"></td>
-          <td><input type="checkbox"></td>
-        </tr>
+      
       `;
 
       const resultContainer = document.getElementById('resultContainer');
@@ -349,36 +337,63 @@
       document.getElementById('result').innerHTML = '';
     }
 
-    function calculateRefund() {
-      const points = parseInt(document.getElementById('points').value) || 0;
-      const extraCouponRaw = parseInt(document.getElementById('extraCoupon').value) || 0;
-      const extraCouponType = document.getElementById('extraCouponType').value;
-      const reason = document.getElementById('reason').value;
-      const returnShippingPayment = document.getElementById('returnShippingPayment').value;
+function calculateRefund() {
+  const points = parseInt(document.getElementById('points').value) || 0;
+  const extraCouponRaw = parseInt(document.getElementById('extraCoupon').value) || 0;
+  const extraCouponType = document.getElementById('extraCouponType').value;
+  const reason = document.getElementById('reason').value;
+  const returnShippingPayment = document.getElementById('returnShippingPayment').value;
 
-      const initialShippingMode = document.getElementById('initialShippingMode').value;
-      const initialShippingAmount = parseInt(document.getElementById('initialShippingAmount').value) || 0;
-      const initialShippingWasFree = (initialShippingMode === 'free');
+  const initialShippingMode = document.getElementById('initialShippingMode').value;
+  const initialShippingAmount = parseInt(document.getElementById('initialShippingAmount').value) || 0;
+  const initialShippingWasFree = (initialShippingMode === 'free');
 
-      const rows = document.getElementById("productTable").getElementsByTagName("tbody")[0].rows;
+  // ✅ 1번만 선언
+  const rows = document.getElementById("productTable").getElementsByTagName("tbody")[0].rows;
 
-      // 1) 상품 전체 합계
-      let totalBeforeCoupon = 0;
-      for (let row of rows) {
-        const price = parseInt(row.cells[1].querySelector("input").value) || 0;
-        const discount = parseInt(row.cells[2].querySelector("input").value) || 0;
-        const qty = Math.max(parseInt(row.cells[3].querySelector("input").value) || 1, 1);
-        totalBeforeCoupon += Math.max(price - discount, 0) * qty;
-      }
+  // ✅ 빈행 제외
+  const effectiveRows = Array.from(rows).filter(row => {
+    const name = (row.cells[0].querySelector("input").value || "").trim();
+    const price = parseInt(row.cells[1].querySelector("input").value) || 0;
+    const discount = parseInt(row.cells[2].querySelector("input").value) || 0;
+    const qty = Math.max(parseInt(row.cells[3].querySelector("input").value) || 1, 1);
+    const line = Math.max(price - discount, 0) * qty;
+    return name !== "" || line > 0;
+  });
 
-      // 2) 일반쿠폰
-      let extraCoupon = 0;
-      if (extraCouponType === 'amount') extraCoupon = extraCouponRaw;
-      else {
-        const percent = Math.max(0, Math.min(extraCouponRaw, 100));
-        extraCoupon = Math.floor(totalBeforeCoupon * (percent / 100));
-      }
-      extraCoupon = Math.min(extraCoupon, totalBeforeCoupon);
+  // ✅ 유효 상품이 없으면 종료 (선택)
+  if (effectiveRows.length === 0) {
+    const resultContainer = document.getElementById('resultContainer');
+    resultContainer.classList.add('empty');
+    resultContainer.innerHTML = `
+      <div class="result-top"><span class="result-label">Refund Breakdown</span></div>
+      <div class="result-text"><p class="result-empty">상품 정보가 입력되지 않았습니다. 최소 1개 상품을 입력해주세요.</p></div>
+    `;
+    return;
+  }
+
+  // 1) 상품 전체 합계  ✅ 여기서도 effectiveRows 사용!
+  let totalBeforeCoupon = 0;
+  for (let row of effectiveRows) {
+    const price = parseInt(row.cells[1].querySelector("input").value) || 0;
+    const discount = parseInt(row.cells[2].querySelector("input").value) || 0;
+    const qty = Math.max(parseInt(row.cells[3].querySelector("input").value) || 1, 1);
+    totalBeforeCoupon += Math.max(price - discount, 0) * qty;
+  }
+
+  // 2) 일반쿠폰
+  let extraCoupon = 0;
+  if (extraCouponType === 'amount') extraCoupon = extraCouponRaw;
+  else {
+    const percent = Math.max(0, Math.min(extraCouponRaw, 100));
+    extraCoupon = Math.floor(totalBeforeCoupon * (percent / 100));
+  }
+  extraCoupon = Math.min(extraCoupon, totalBeforeCoupon);
+
+  // ... 그리고 아래쪽 모든 for문도 rows → effectiveRows 로 바꿔주면 끝
+}
+
+      
 
       // 3) 조건부 쿠폰 수집
       let selectedCoupons = [];
@@ -534,3 +549,4 @@
   </script>
 </body>
 </html>
+
