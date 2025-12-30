@@ -471,7 +471,6 @@ const effectiveRows = Array.from(rows).filter(row => {
       finalRefund -= lostConditionalCoupon;
     }
 
-    const BROKEN_FREE_SHIPPING_INITIAL_FEE = 3000; // 무료배송 깨졌을 때 차감할 초도배송비
 
 
   // 6) 배송비
@@ -547,6 +546,7 @@ if (reason === "buyer" && hasRefund) {
 </script>
 </body>
 </html>
+
 
 
 
