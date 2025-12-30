@@ -474,46 +474,50 @@ const effectiveRows = Array.from(rows).filter(row => {
     const BROKEN_FREE_SHIPPING_INITIAL_FEE = 3000; // 무료배송 깨졌을 때 차감할 초도배송비
 
 
-    // 6) 배송비
-    const FREE_LIMIT = 30000;
-    const RETURN_SHIPPING = 3000;
-    let shippingDeduction = 0;
-    let shippingDetails = "<br><strong>배송비 내역:</strong><br>";
+  // 6) 배송비
+const FREE_LIMIT = 30000;
+const RETURN_SHIPPING = 3000;
+const BROKEN_FREE_SHIPPING_INITIAL_FEE = 3000; // 무료배송 조건 깨졌을 때 차감할 초도배송비(기준값)
 
-    if (reason === "buyer" && hasRefund) {
-      if (returnShippingPayment === "deduct") {
-        shippingDeduction += RETURN_SHIPPING;
-        shippingDetails += `반품배송비 차감: -${RETURN_SHIPPING.toLocaleString()}원<br>`;
-      } else {
-        shippingDetails += `반품배송비 선결제(직접 부담): 환불액에서 추가 차감 없음<br>`;
-      }
+let shippingDeduction = 0;
+let shippingDetails = "<br><strong>배송비 내역:</strong><br>";
 
-     const initialFee = initialShippingWasFree
-  ? BROKEN_FREE_SHIPPING_INITIAL_FEE
-  : Math.max(initialShippingAmount, 0);
+if (reason === "buyer" && hasRefund) {
+  // 반품배송비
+  if (returnShippingPayment === "deduct") {
+    shippingDeduction += RETURN_SHIPPING;
+    shippingDetails += `반품배송비 차감: -${RETURN_SHIPPING.toLocaleString()}원<br>`;
+  } else {
+    shippingDetails += `반품배송비 선결제(직접 부담): 환불액에서 추가 차감 없음<br>`;
+  }
 
-        if (allRefunded) {
-          shippingDeduction += initialFee;
-          shippingDetails += `초도배송비 차감(무료배송 → 전체반품): -${initialFee.toLocaleString()}원<br>`;
-        } else if (keptTotal < FREE_LIMIT) {
-          shippingDeduction += initialFee;
-          shippingDetails += `남은 금액 ${keptTotal.toLocaleString()}원 < ${FREE_LIMIT.toLocaleString()}원 & 무료배송 → 초도배송비 차감: -${initialFee.toLocaleString()}원<br>`;
-        } else {
-          shippingDetails += `남은 금액이 무료배송 기준 충족 → 초도배송비 추가 차감 없음<br>`;
-        }
-      } else {
-        shippingDetails += `초도배송비는 이미 결제된 주문(${initialShippingMode}) → 추가 차감 없음<br>`;
-      }
+  // ✅ 초도배송비(무료배송 조건 깨짐 처리 포함)
+  if (initialShippingWasFree) {
+    const initialFee = BROKEN_FREE_SHIPPING_INITIAL_FEE; // free면 UI값(0) 말고 기준값(3000)을 씀
+
+    if (allRefunded) {
+      shippingDeduction += initialFee;
+      shippingDetails += `초도배송비 차감(무료배송 → 전체반품): -${initialFee.toLocaleString()}원<br>`;
+    } else if (keptTotal < FREE_LIMIT) {
+      shippingDeduction += initialFee;
+      shippingDetails += `남은 금액 ${keptTotal.toLocaleString()}원 < ${FREE_LIMIT.toLocaleString()}원 & 무료배송 → 초도배송비 차감: -${initialFee.toLocaleString()}원<br>`;
     } else {
-      shippingDetails += "판매자 사유: 반품배송비/초도배송비 차감 없음<br>";
-      if (allRefunded && !initialShippingWasFree) {
-        const initialFee = Math.max(initialShippingAmount, 0);
-        if (initialFee > 0) {
-          finalRefund += initialFee;
-          shippingDetails += `초도배송비 환급(판매자 사유 전액환불): +${initialFee.toLocaleString()}원<br>`;
-        }
-      }
+      shippingDetails += `남은 금액이 무료배송 기준 충족 → 초도배송비 추가 차감 없음<br>`;
     }
+  } else {
+    shippingDetails += `초도배송비는 이미 결제된 주문(${initialShippingMode}) → 추가 차감 없음<br>`;
+  }
+} else {
+  shippingDetails += "판매자 사유: 반품배송비/초도배송비 차감 없음<br>";
+  if (allRefunded && !initialShippingWasFree) {
+    const initialFee = Math.max(initialShippingAmount, 0);
+    if (initialFee > 0) {
+      finalRefund += initialFee;
+      shippingDetails += `초도배송비 환급(판매자 사유 전액환불): +${initialFee.toLocaleString()}원<br>`;
+    }
+  }
+}
+
 
     finalRefund -= shippingDeduction;
     const safeFinalRefund = Math.max(finalRefund, 0);
@@ -543,6 +547,7 @@ const effectiveRows = Array.from(rows).filter(row => {
 </script>
 </body>
 </html>
+
 
 
 
