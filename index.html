@@ -471,6 +471,9 @@ const effectiveRows = Array.from(rows).filter(row => {
       finalRefund -= lostConditionalCoupon;
     }
 
+    const BROKEN_FREE_SHIPPING_INITIAL_FEE = 3000; // 무료배송 깨졌을 때 차감할 초도배송비
+
+
     // 6) 배송비
     const FREE_LIMIT = 30000;
     const RETURN_SHIPPING = 3000;
@@ -485,8 +488,10 @@ const effectiveRows = Array.from(rows).filter(row => {
         shippingDetails += `반품배송비 선결제(직접 부담): 환불액에서 추가 차감 없음<br>`;
       }
 
-      if (initialShippingWasFree) {
-        const initialFee = Math.max(initialShippingAmount, 0);
+     const initialFee = initialShippingWasFree
+  ? BROKEN_FREE_SHIPPING_INITIAL_FEE
+  : Math.max(initialShippingAmount, 0);
+
         if (allRefunded) {
           shippingDeduction += initialFee;
           shippingDetails += `초도배송비 차감(무료배송 → 전체반품): -${initialFee.toLocaleString()}원<br>`;
@@ -538,6 +543,7 @@ const effectiveRows = Array.from(rows).filter(row => {
 </script>
 </body>
 </html>
+
 
 
 
